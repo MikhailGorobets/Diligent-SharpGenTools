@@ -127,18 +127,18 @@ public sealed class CppParser
     }
 
     /// <summary>
-    /// Gets the name of the generated GCCXML file.
+    /// Gets the name of the generated CastXML file.
     /// </summary>
-    /// <value>The name of the generated GCCXML file.</value>
-    private string GccXmlFileName => Path.Combine(OutputPath, _configRoot.Id + "-gcc.xml");
+    /// <value>The name of the generated CastXML file.</value>
+    private string CastXmlFileName => Path.Combine(OutputPath, _configRoot.Id + ".xml");
 
     public string RootConfigHeaderFileName => Path.Combine(OutputPath, _configRoot.HeaderFileName);
 
     /// <summary>
-    /// Gets or sets the GccXml doc.
+    /// Gets or sets the CastXml doc.
     /// </summary>
-    /// <value>The GccXml doc.</value>
-    private XDocument GccXmlDoc { get; set; }
+    /// <value>The CastXml doc.</value>
+    private XDocument CastXmlDoc { get; set; }
 
     public Dictionary<string, int> IncludeMacroCounts { get; } = new();
 
@@ -155,7 +155,6 @@ public sealed class CppParser
 
         try
         {
-
             Logger.Progress(15, progressMessage);
 
             if (xmlReader != null)
@@ -173,17 +172,17 @@ public sealed class CppParser
         {
             Logger.Message("Parsing headers is finished.");
 
-            // Write back GCC-XML document on the disk
+            // Write back CastXML document on the disk
             try
             {
-                using var stream = File.Open(GccXmlFileName, FileMode.Create, FileAccess.Write);
-                GccXmlDoc?.Save(stream);
+                using var stream = File.Open(CastXmlFileName, FileMode.Create, FileAccess.Write);
+                CastXmlDoc?.Save(stream);
             }
             catch (Exception e)
             {
                 Logger.LogRawMessage(
                     LogLevel.Warning, LoggingCodes.ParserDiagnosticDumpIoError,
-                    "Writing GCC-XML file [{0}] failed", e, GccXmlFileName
+                    "Writing CastXML file [{0}] failed", e, CastXmlFileName
                 );
             }
         }
@@ -208,10 +207,10 @@ public sealed class CppParser
     {
         var doc = XDocument.Load(reader);
 
-        GccXmlDoc = doc;
+        CastXmlDoc = doc;
 
-        // Collects all GccXml elements and build map from their id
-        foreach (var xElement in doc.Elements("GCC_XML").Elements())
+        // Collects all CastXml elements and build map from their id
+        foreach (var xElement in doc.Elements("CastXML").Elements())
         {
             var id = xElement.Attribute("id").Value;
             _mapIdToXElement.Add(id, xElement);
@@ -248,7 +247,7 @@ public sealed class CppParser
 
     private void AdjustTypeNamesFromTypedefs(XDocument doc)
     {
-        foreach (var xTypedef in doc.Elements("GCC_XML").Elements(CastXml.TagTypedef))
+        foreach (var xTypedef in doc.Elements("CastXML").Elements(CastXml.TagTypedef))
         {
             var xStruct = _mapIdToXElement[xTypedef.AttributeValue("type")];
             switch (xStruct.Name.LocalName)
@@ -271,7 +270,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ function.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ function.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ function.</param>
     /// <returns>A C++ function parsed</returns>
     private CppFunction ParseFunction(XElement xElement)
     {
@@ -284,7 +283,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ parameters.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ parameter.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ parameter.</param>
     /// <param name="methodOrFunction">The method or function to populate.</param>
     private void ParseParameters(XElement xElement, CppContainer methodOrFunction)
     {
@@ -315,7 +314,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses C++ annotations/attributes.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that contains C++ annotations/attributes.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that contains C++ annotations/attributes.</param>
     /// <param name="cppElement">The C++ element to populate.</param>
     private void ParseAnnotations(XElement xElement, CppElement cppElement)
     {
@@ -358,7 +357,7 @@ public sealed class CppParser
         string guid = null;
 
         // Parse attributes
-        const string gccXmlAttribute = "annotate(";
+        const string castXmlAttribute = "annotate(";
         var isPre = false;
         var isPost = false;
         var hasWritable = false;
@@ -367,8 +366,8 @@ public sealed class CppParser
         foreach (var item in attributes.Split(' '))
         {
             var newItem = item;
-            if (newItem.StartsWith(gccXmlAttribute))
-                newItem = newItem.Substring(gccXmlAttribute.Length);
+            if (newItem.StartsWith(castXmlAttribute))
+                newItem = newItem.Substring(castXmlAttribute.Length);
 
             if (newItem.StartsWith("SAL_begin"))
             {
@@ -464,7 +463,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ method or function.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ method/function declaration.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ method/function declaration.</param>
     /// <returns>The C++ parsed T.</returns>
     private void ParseCallable(CppCallable cppCallable, XElement xElement)
     {
@@ -485,7 +484,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ COM interface.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ COM interface declaration.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ COM interface declaration.</param>
     /// <returns>A C++ interface parsed</returns>
     private CppInterface ParseInterface(XElement xElement)
     {
@@ -598,7 +597,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ field declaration.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ structure field declaration.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ structure field declaration.</param>
     /// <returns>A C++ field parsed</returns>
     private CppField ParseField(XElement xElement, int fieldOffset)
     {
@@ -629,7 +628,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ struct or union declaration.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ struct or union declaration.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ struct or union declaration.</param>
     /// <param name="cppParent">The C++ parent object (valid for anonymous inner declaration) .</param>
     /// <param name="innerAnonymousIndex">An index that counts the number of anonymous declaration in order to set a unique name</param>
     /// <returns>A C++ struct parsed</returns>
@@ -764,7 +763,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ enum declaration.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ enum declaration.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ enum declaration.</param>
     /// <returns>A C++ parsed enum</returns>
     private CppEnum ParseEnum(XElement xElement)
     {
@@ -809,7 +808,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ variable declaration/definition.
     /// </summary>
-    /// <param name="xElement">The gccxml <see cref="XElement"/> that describes a C++ variable declaration/definition.</param>
+    /// <param name="xElement">The castxml <see cref="XElement"/> that describes a C++ variable declaration/definition.</param>
     /// <returns>A C++ parsed variable</returns>
     private CppElement ParseVariable(XElement xElement)
     {
@@ -844,7 +843,7 @@ public sealed class CppParser
     /// <summary>
     /// Parses a C++ GUID definition string.
     /// </summary>
-    /// <param name="guidInitText">The text of a GUID gccxml initialization.</param>
+    /// <param name="guidInitText">The text of a GUID castxml initialization.</param>
     /// <returns>The parsed Guid</returns>
     private static Guid? ParseGuid(string guidInitText)
     {
@@ -884,9 +883,9 @@ public sealed class CppParser
     /// </summary>
     private void ParseAllElements()
     {
-        foreach (var includeGccXmlId in _mapFileToXElement.Keys)
+        foreach (var includeCastXmlId in _mapFileToXElement.Keys)
         {
-            var includeId = GetIncludeIdFromFileId(includeGccXmlId);
+            var includeId = GetIncludeIdFromFileId(includeCastXmlId);
 
             // Process only files listed inside the config files
             if (!_includeToProcess.Contains(includeId))
@@ -906,15 +905,15 @@ public sealed class CppParser
                 _group.Add(_currentCppInclude);
             }
 
-            ParseElementsInInclude(includeGccXmlId, includeId, isIncludeFullyAttached);
+            ParseElementsInInclude(includeCastXmlId, includeId, isIncludeFullyAttached);
 
             Logger.PopContext();
         }
     }
 
-    private void ParseElementsInInclude(string includeGccXmlId, string includeId, bool isIncludeFullyAttached)
+    private void ParseElementsInInclude(string includeCastXmlId, string includeId, bool isIncludeFullyAttached)
     {
-        foreach (var xElement in _mapFileToXElement[includeGccXmlId])
+        foreach (var xElement in _mapFileToXElement[includeCastXmlId])
         {
             // If the element is not defined from a root namespace
             // than skip it, as it might be an inner type
@@ -1104,7 +1103,7 @@ public sealed class CppParser
     }
 
     /// <summary>
-    /// Converts a gccxml FundamentalType to a shorter form:
+    /// Converts a castxml FundamentalType to a shorter form:
     ///	signed char          => char
     ///	long long int        => long long
     ///	short unsigned int   => unsigned short
@@ -1122,7 +1121,7 @@ public sealed class CppParser
     ///	void                 => void
     ///	long double          => long double
     /// </summary>
-    /// <param name="typeName">Name of the gccxml fundamental type.</param>
+    /// <param name="typeName">Name of the castxml fundamental type.</param>
     /// <returns>a shorten form</returns>
     private string ConvertFundamentalType(string typeName)
     {
