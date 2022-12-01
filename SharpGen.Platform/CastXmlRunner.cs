@@ -155,7 +155,7 @@ public sealed class CastXmlRunner : ICastXmlRunner
 
     private IEnumerable<string> GetCastXmlArgs()
     {
-        return AdditionalArguments.Append("--castxml-gccxml")
+        return AdditionalArguments.Append("--castxml-output=1")
                                   .Append("-m32")
                                   .Append("-x c++")
                                   .Append("-Wmacro-redefined")

@@ -130,7 +130,7 @@ public sealed class CppParser
     /// Gets the name of the generated GCCXML file.
     /// </summary>
     /// <value>The name of the generated GCCXML file.</value>
-    private string GccXmlFileName => Path.Combine(OutputPath, _configRoot.Id + "-gcc.xml");
+    private string CastXmlFileName => Path.Combine(OutputPath, _configRoot.Id + ".xml");
 
     public string RootConfigHeaderFileName => Path.Combine(OutputPath, _configRoot.HeaderFileName);
 
@@ -176,14 +176,14 @@ public sealed class CppParser
             // Write back GCC-XML document on the disk
             try
             {
-                using var stream = File.Open(GccXmlFileName, FileMode.Create, FileAccess.Write);
+                using var stream = File.Open(CastXmlFileName, FileMode.Create, FileAccess.Write);
                 GccXmlDoc?.Save(stream);
             }
             catch (Exception e)
             {
                 Logger.LogRawMessage(
                     LogLevel.Warning, LoggingCodes.ParserDiagnosticDumpIoError,
-                    "Writing GCC-XML file [{0}] failed", e, GccXmlFileName
+                    "Writing GCC-XML file [{0}] failed", e, CastXmlFileName
                 );
             }
         }
@@ -211,7 +211,7 @@ public sealed class CppParser
         GccXmlDoc = doc;
 
         // Collects all GccXml elements and build map from their id
-        foreach (var xElement in doc.Elements("GCC_XML").Elements())
+        foreach (var xElement in doc.Elements("CastXML").Elements())
         {
             var id = xElement.Attribute("id").Value;
             _mapIdToXElement.Add(id, xElement);
@@ -248,7 +248,7 @@ public sealed class CppParser
 
     private void AdjustTypeNamesFromTypedefs(XDocument doc)
     {
-        foreach (var xTypedef in doc.Elements("GCC_XML").Elements(CastXml.TagTypedef))
+        foreach (var xTypedef in doc.Elements("CastXML").Elements(CastXml.TagTypedef))
         {
             var xStruct = _mapIdToXElement[xTypedef.AttributeValue("type")];
             switch (xStruct.Name.LocalName)
@@ -603,9 +603,11 @@ public sealed class CppParser
     private CppField ParseField(XElement xElement, int fieldOffset)
     {
         var fieldName = xElement.AttributeValue("name");
+        var init = xElement.AttributeValue("init");
         var cppField = new CppField(string.IsNullOrEmpty(fieldName) ? $"field{fieldOffset}" : fieldName)
         {
-            Offset = fieldOffset
+            Offset = fieldOffset,
+            DefaultValue = init,
         };
 
         Logger.PushContext("Field:[{0}]", cppField.Name);
