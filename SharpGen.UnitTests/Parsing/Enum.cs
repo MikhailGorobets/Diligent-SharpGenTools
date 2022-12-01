@@ -79,7 +79,7 @@ public class Enum : ParsingTestBase
         Assert.Single(model.Find<CppEnum>("TestEnum"));
     }
 
-    [Fact(Skip = "CastXML in GCCXml compat mode does not support C++11 and newer features.")]
+    [Fact(Skip = "CastXML in compat mode does not support C++11 and newer features.")]
     public void SpecifiedUnderlyingType()
     {
         var config = new ConfigFile

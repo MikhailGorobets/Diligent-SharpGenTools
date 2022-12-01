@@ -127,18 +127,18 @@ public sealed class CppParser
     }
 
     /// <summary>
-    /// Gets the name of the generated GCCXML file.
+    /// Gets the name of the generated CastXML file.
     /// </summary>
-    /// <value>The name of the generated GCCXML file.</value>
-    private string GccXmlFileName => Path.Combine(OutputPath, _configRoot.Id + "-gcc.xml");
+    /// <value>The name of the generated CastXML file.</value>
+    private string CastXmlFileName => Path.Combine(OutputPath, _configRoot.Id + ".xml");
 
     public string RootConfigHeaderFileName => Path.Combine(OutputPath, _configRoot.HeaderFileName);
 
     /// <summary>
-    /// Gets or sets the GccXml doc.
+    /// Gets or sets the CastXml doc.
     /// </summary>
-    /// <value>The GccXml doc.</value>
-    private XDocument GccXmlDoc { get; set; }
+    /// <value>The CastXml doc.</value>
+    private XDocument CastXmlDoc { get; set; }
 
     public Dictionary<string, int> IncludeMacroCounts { get; } = new();
 
@@ -155,7 +155,6 @@ public sealed class CppParser
 
         try
         {
-
             Logger.Progress(15, progressMessage);
 
             if (xmlReader != null)
@@ -173,17 +172,17 @@ public sealed class CppParser
         {
             Logger.Message("Parsing headers is finished.");
 
-            // Write back GCC-XML document on the disk
+            // Write back CastXML document on the disk
             try
             {
-                using var stream = File.Open(GccXmlFileName, FileMode.Create, FileAccess.Write);
-                GccXmlDoc?.Save(stream);
+                using var stream = File.Open(CastXmlFileName, FileMode.Create, FileAccess.Write);
+                CastXmlDoc?.Save(stream);
             }
             catch (Exception e)
             {
                 Logger.LogRawMessage(
                     LogLevel.Warning, LoggingCodes.ParserDiagnosticDumpIoError,
-                    "Writing GCC-XML file [{0}] failed", e, GccXmlFileName
+                    "Writing CastXML file [{0}] failed", e, CastXmlFileName
                 );
             }
         }
@@ -208,10 +207,10 @@ public sealed class CppParser
     {
         var doc = XDocument.Load(reader);
 
-        GccXmlDoc = doc;
+        CastXmlDoc = doc;
 
-        // Collects all GccXml elements and build map from their id
-        foreach (var xElement in doc.Elements("GCC_XML").Elements())
+        // Collects all CastXml elements and build map from their id
+        foreach (var xElement in doc.Elements("CastXML").Elements())
         {
             var id = xElement.Attribute("id").Value;
             _mapIdToXElement.Add(id, xElement);
@@ -248,7 +247,7 @@ public sealed class CppParser
 
     private void AdjustTypeNamesFromTypedefs(XDocument doc)
     {
-        foreach (var xTypedef in doc.Elements("GCC_XML").Elements(CastXml.TagTypedef))
+        foreach (var xTypedef in doc.Elements("CastXML").Elements(CastXml.TagTypedef))
         {
             var xStruct = _mapIdToXElement[xTypedef.AttributeValue("type")];
             switch (xStruct.Name.LocalName)
@@ -603,9 +602,11 @@ public sealed class CppParser
     private CppField ParseField(XElement xElement, int fieldOffset)
     {
         var fieldName = xElement.AttributeValue("name");
+        var init = xElement.AttributeValue("init");
         var cppField = new CppField(string.IsNullOrEmpty(fieldName) ? $"field{fieldOffset}" : fieldName)
         {
-            Offset = fieldOffset
+            Offset = fieldOffset,
+            DefaultValue = init,
         };
 
         Logger.PushContext("Field:[{0}]", cppField.Name);
@@ -884,9 +885,9 @@ public sealed class CppParser
     /// </summary>
     private void ParseAllElements()
     {
-        foreach (var includeGccXmlId in _mapFileToXElement.Keys)
+        foreach (var includeCastXmlId in _mapFileToXElement.Keys)
         {
-            var includeId = GetIncludeIdFromFileId(includeGccXmlId);
+            var includeId = GetIncludeIdFromFileId(includeCastXmlId);
 
             // Process only files listed inside the config files
             if (!_includeToProcess.Contains(includeId))
@@ -906,15 +907,15 @@ public sealed class CppParser
                 _group.Add(_currentCppInclude);
             }
 
-            ParseElementsInInclude(includeGccXmlId, includeId, isIncludeFullyAttached);
+            ParseElementsInInclude(includeCastXmlId, includeId, isIncludeFullyAttached);
 
             Logger.PopContext();
         }
     }
 
-    private void ParseElementsInInclude(string includeGccXmlId, string includeId, bool isIncludeFullyAttached)
+    private void ParseElementsInInclude(string includeCastXmlId, string includeId, bool isIncludeFullyAttached)
     {
-        foreach (var xElement in _mapFileToXElement[includeGccXmlId])
+        foreach (var xElement in _mapFileToXElement[includeCastXmlId])
         {
             // If the element is not defined from a root namespace
             // than skip it, as it might be an inner type
