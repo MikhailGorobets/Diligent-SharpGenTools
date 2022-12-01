@@ -23,17 +23,17 @@ namespace SharpGen.Platform;
 public static class CastXml
 {
     /// <summary>
-    ///     GccXml tag for FundamentalType
+    ///     CastXml tag for FundamentalType
     /// </summary>
     public const string TagFundamentalType = "FundamentalType";
 
     /// <summary>
-    ///     GccXml tag for Enumeration
+    ///     CastXml tag for Enumeration
     /// </summary>
     public const string TagEnumeration = "Enumeration";
 
     /// <summary>
-    ///     GccXml tag for Struct
+    ///     CastXml tag for Struct
     /// </summary>
     public const string TagStruct = "Struct";
 
@@ -43,57 +43,57 @@ public static class CastXml
     public const string TagClass = "Class";
 
     /// <summary>
-    ///     GccXml tag for Field
+    ///     CastXml tag for Field
     /// </summary>
     public const string TagField = "Field";
 
     /// <summary>
-    ///     GccXml tag for Union
+    ///     CastXml tag for Union
     /// </summary>
     public const string TagUnion = "Union";
 
     /// <summary>
-    ///     GccXml tag for Typedef
+    ///     CastXml tag for Typedef
     /// </summary>
     public const string TagTypedef = "Typedef";
 
     /// <summary>
-    ///     GccXml tag for Function
+    ///     CastXml tag for Function
     /// </summary>
     public const string TagFunction = "Function";
 
     /// <summary>
-    ///     GccXml tag for PointerType
+    ///     CastXml tag for PointerType
     /// </summary>
     public const string TagPointerType = "PointerType";
 
     /// <summary>
-    ///     GccXml tag for ArrayType
+    ///     CastXml tag for ArrayType
     /// </summary>
     public const string TagArrayType = "ArrayType";
 
     /// <summary>
-    ///     GccXml tag for ReferenceType
+    ///     CastXml tag for ReferenceType
     /// </summary>
     public const string TagReferenceType = "ReferenceType";
 
     /// <summary>
-    ///     GccXml tag for CvQualifiedType
+    ///     CastXml tag for CvQualifiedType
     /// </summary>
     public const string TagCvQualifiedType = "CvQualifiedType";
 
     /// <summary>
-    ///     GccXml tag for Namespace
+    ///     CastXml tag for Namespace
     /// </summary>
     public const string TagNamespace = "Namespace";
 
     /// <summary>
-    ///     GccXml tag for Variable
+    ///     CastXml tag for Variable
     /// </summary>
     public const string TagVariable = "Variable";
 
     /// <summary>
-    ///     GccXml tag for FunctionType
+    ///     CastXml tag for FunctionType
     /// </summary>
     public const string TagFunctionType = "FunctionType";
 }

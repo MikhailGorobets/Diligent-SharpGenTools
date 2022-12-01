@@ -33,7 +33,7 @@ public sealed class MacroManager
 {
     private static readonly Regex MatchIncludeLine = new(@"^\s*#\s+\d+\s+""([^""]+)""", RegexOptions.Compiled);
     private static readonly Regex MatchDefine = new(@"^\s*#define\s+([a-zA-Z_][\w_]*)\s+(.*)", RegexOptions.Compiled);
-    private readonly ICastXmlRunner _gccxml;
+    private readonly ICastXmlRunner _castxml;
     private Dictionary<string, string> _currentMacros;
     private readonly Dictionary<string, Dictionary<string, string>> _mapIncludeToMacros = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly HashSet<string> _includedFiles = new(StringComparer.InvariantCultureIgnoreCase);
@@ -41,10 +41,10 @@ public sealed class MacroManager
     /// <summary>
     /// Initializes a new instance of the <see cref="MacroManager"/> class.
     /// </summary>
-    /// <param name="gccxml">The GccXml parser.</param>
-    public MacroManager(ICastXmlRunner gccxml)
+    /// <param name="castxml">The GccXml parser.</param>
+    public MacroManager(ICastXmlRunner castxml)
     {
-        _gccxml = gccxml;
+        _castxml = castxml;
     }
 
     public IEnumerable<string> IncludedFiles => _includedFiles;
@@ -56,7 +56,7 @@ public sealed class MacroManager
     /// <param name="group">The CppModule object to fill with macro definitions.</param>
     public void Parse(string file, CppModule group)
     {
-        _gccxml.Preprocess(file, ParseLine);
+        _castxml.Preprocess(file, ParseLine);
 
         foreach (var includeName in _mapIncludeToMacros.Keys)
         {
