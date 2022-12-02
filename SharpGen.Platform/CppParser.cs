@@ -607,7 +607,7 @@ public sealed class CppParser
             Offset = fieldOffset
         };
 
-        Logger.PushContext("Field:[{0}]", cppField.Name);
+        Logger.PushContext($"Field:[{cppField.Name}]");
 
         // Handle bitfield info
         var bitField = xElement.AttributeValue("bits");
@@ -648,7 +648,7 @@ public sealed class CppParser
         cppStruct.IsUnion = isUnion;
 
         // Enter struct/union description
-        Logger.PushContext("{0}:[{1}]", xElement.Name.LocalName, cppStruct.Name);
+        Logger.PushContext($"{xElement.Name.LocalName}:[{cppStruct.Name}]");
 
         var basesValue = xElement.AttributeValue("bases");
         var bases = basesValue != null ? basesValue.Split(' ') : Enumerable.Empty<string>();
@@ -658,17 +658,17 @@ public sealed class CppParser
         // Parse all fields
         var fieldOffset = 0;
         var innerStructCount = 0;
-        foreach (var field in xElement.Elements())
+        foreach (var field in xElement.Elements().Where(x => x.Name.LocalName == CastXml.TagField))
         {
-            if (field.Name.LocalName != CastXml.TagField)
-                continue;
-
             // Parse the field
             var cppField = ParseField(field, fieldOffset);
 
             // Test if the field type is declared inside this struct or union
             var fieldName = field.AttributeValue("name");
             var fieldType = _mapIdToXElement[field.AttributeValue("type")];
+            if (fieldType.Name.LocalName == CastXml.TagElaboratedType)
+                fieldType = _mapIdToXElement[fieldType.AttributeValue("type")];
+
             if (fieldType.AttributeValue("context") == xElement.AttributeValue("id"))
             {
                 var fieldSubStruct = ParseStructOrUnion(fieldType, cppStruct, innerStructCount++);
@@ -1022,6 +1022,9 @@ public sealed class CppParser
                 case CastXml.TagUnion:
                     type.TypeName = name;
                     isTypeResolved = true;
+                    break;
+                case CastXml.TagElaboratedType:
+                    xType = _mapIdToXElement[nextType];
                     break;
                 case CastXml.TagTypedef:
                     if (_boundTypes.Contains(name))

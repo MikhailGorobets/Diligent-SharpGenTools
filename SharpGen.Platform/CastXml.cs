@@ -96,4 +96,9 @@ public static class CastXml
     ///     CastXml tag for FunctionType
     /// </summary>
     public const string TagFunctionType = "FunctionType";
+
+    /// <summary>
+    ///     CastXml tag for ElaboratedType
+    /// </summary>
+    public const string TagElaboratedType = "ElaboratedType";
 }
