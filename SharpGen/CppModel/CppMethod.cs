@@ -27,7 +27,7 @@ public sealed class CppMethod : CppCallable
     public int Offset { get; set; }
     public int WindowsOffset { get; set; }
 
-    protected override CallingConvention DefaultCallingConvention => CppCallingConvention.ThisCall;
+    protected override CallingConvention DefaultCallingConvention => CppCallingConvention.CDecl;
 
     public CppMethod(string name) : base(name)
     {
