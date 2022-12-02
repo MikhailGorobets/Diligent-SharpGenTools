@@ -245,11 +245,20 @@ public sealed class CppParser
         ParseAllElements();
     }
 
+    private XElement ResolveElaboratedType(XElement item)
+    {
+        var xStruct = _mapIdToXElement[item.AttributeValue("type")];
+        if (xStruct.Name.LocalName == CastXml.TagElaboratedType)
+            xStruct = _mapIdToXElement[xStruct.AttributeValue("type")];
+        return xStruct;
+    }
+
     private void AdjustTypeNamesFromTypedefs(XDocument doc)
     {
         foreach (var xTypedef in doc.Elements("CastXML").Elements(CastXml.TagTypedef))
         {
-            var xStruct = _mapIdToXElement[xTypedef.AttributeValue("type")];
+            var xStruct = ResolveElaboratedType(xTypedef); 
+
             switch (xStruct.Name.LocalName)
             {
                 case CastXml.TagStruct:
@@ -658,16 +667,14 @@ public sealed class CppParser
         // Parse all fields
         var fieldOffset = 0;
         var innerStructCount = 0;
-        foreach (var field in xElement.Elements().Where(x => x.Name.LocalName == CastXml.TagField))
+        foreach (var field in xElement.Elements(CastXml.TagField))
         {
             // Parse the field
             var cppField = ParseField(field, fieldOffset);
 
             // Test if the field type is declared inside this struct or union
             var fieldName = field.AttributeValue("name");
-            var fieldType = _mapIdToXElement[field.AttributeValue("type")];
-            if (fieldType.Name.LocalName == CastXml.TagElaboratedType)
-                fieldType = _mapIdToXElement[fieldType.AttributeValue("type")];
+            var fieldType = ResolveElaboratedType(field); 
 
             if (fieldType.AttributeValue("context") == xElement.AttributeValue("id"))
             {
