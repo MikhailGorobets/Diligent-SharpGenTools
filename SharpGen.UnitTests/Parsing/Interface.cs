@@ -210,4 +210,41 @@ public class Interface : ParsingTestBase
 
         Assert.Equal(CppCallingConvention.ThisCall, model.FindFirst<CppMethod>("Test::Method").CallingConvention);
     }
+
+    [Fact]
+    public void CallConvension()
+    {
+        var config = new ConfigFile
+        {
+            Id = nameof(CallConvension),
+            Namespace = nameof(CallConvension),
+            IncludeDirs =
+            {
+                GetTestFileIncludeRule()
+            },
+            Includes =
+            {
+                CreateCppFile("interfaces", @"
+                        struct Interface
+                        {
+                            virtual void __cdecl CdecCalllMethod() = 0;
+
+                            virtual void __stdcall StdCalllMethod() = 0;
+
+                            virtual void ThisCalllMethod() = 0;
+                        };
+                    "),
+            }
+        };
+
+        var model = ParseCpp(config);
+
+        var method0 = model.FindFirst<CppMethod>("Interface::CdecCalllMethod");
+        var method1 = model.FindFirst<CppMethod>("Interface::StdCalllMethod");
+        var method2 = model.FindFirst<CppMethod>("Interface::ThisCalllMethod");
+
+        Assert.Equal(System.Runtime.InteropServices.CallingConvention.Cdecl, method0.CallingConvention);
+        Assert.Equal(System.Runtime.InteropServices.CallingConvention.StdCall, method1.CallingConvention);
+        Assert.Equal(System.Runtime.InteropServices.CallingConvention.ThisCall, method2.CallingConvention);
+    }
 }
