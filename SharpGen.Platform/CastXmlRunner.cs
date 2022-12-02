@@ -76,10 +76,10 @@ public sealed class CastXmlRunner : ICastXmlRunner
         Logger.RunInContext(nameof(Preprocess), () =>
         {
             if (!File.Exists(ExecutablePath))
-                Logger.Fatal("castxml not found from path: [{0}]", ExecutablePath);
+                Logger.Fatal($"castxml not found from path: [{ExecutablePath}]");
 
             if (!File.Exists(headerFile))
-                Logger.Fatal("C++ Header file [{0}] not found", headerFile);
+                Logger.Fatal($"C++ Header file [{headerFile}] not found");
 
             RunCastXml(headerFile, OutputDataCallback, "-E -dD");
         });
@@ -96,9 +96,9 @@ public sealed class CastXmlRunner : ICastXmlRunner
 
         Logger.RunInContext(nameof(Process), () =>
         {
-            if (!File.Exists(ExecutablePath)) Logger.Fatal("castxml not found from path: [{0}]", ExecutablePath);
+            if (!File.Exists(ExecutablePath)) Logger.Fatal($"castxml not found from path: [{ExecutablePath}]");
 
-            if (!File.Exists(headerFile)) Logger.Fatal("C++ Header file [{0}] not found", headerFile);
+            if (!File.Exists(headerFile)) Logger.Fatal($"C++ Header file [{headerFile}] not found");
 
             var xmlFile = Path.ChangeExtension(headerFile, "xml");
 
@@ -109,7 +109,7 @@ public sealed class CastXmlRunner : ICastXmlRunner
 
             if (!File.Exists(xmlFile) || Logger.HasErrors)
             {
-                Logger.Error(LoggingCodes.CastXmlFailed, "Unable to generate XML file with castxml [{0}]. Check previous errors.", xmlFile);
+                Logger.Error(LoggingCodes.CastXmlFailed, $"Unable to generate XML file with castxml [{xmlFile}]. Check previous errors.");
             }
             else
             {
@@ -126,7 +126,7 @@ public sealed class CastXmlRunner : ICastXmlRunner
                                         .Concat(directoryResolver.IncludeArguments);
         var argumentsString = string.Join(" ", arguments);
 
-        Logger.Message("CastXML {0}", argumentsString);
+        Logger.Message($"CastXML {argumentsString}");
         using var currentProcess = new Process
         {
             StartInfo = new ProcessStartInfo(ExecutablePath)
