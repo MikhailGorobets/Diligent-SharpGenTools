@@ -1,0 +1,28 @@
+name: Windows
+
+on: [push, pull_request]
+
+env:
+  MSBuildEnableWorkloadResolver: false    
+
+jobs:
+  build-win10:
+    strategy:
+      matrix:
+        toolset: [x64]
+        config: [Debug, Release]
+        
+    runs-on: windows-latest    
+    name: Windows 10, ${{ matrix.config }} ${{ matrix.toolset }}
+    
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive 
+    - name: Restore .NET tools
+      working-directory: ${{github.workspace}}
+      run: dotnet tool restore
+    - name: Build
+      working-directory: ${{github.workspace}}
+      run: ./build.ps1 -Configuration ${{matrix.config}}
