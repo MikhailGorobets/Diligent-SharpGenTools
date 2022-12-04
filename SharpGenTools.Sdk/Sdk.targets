@@ -11,7 +11,27 @@
 			   Code="SD0007"
 			   Condition="'$(MSBuildProjectExtension)' != '.csproj'" />
 	</Target>
+		
+	<Target Name="InstallCastXml" Condition="'$(CastXmlPath)' == ''">
+		<PropertyGroup Condition="'$(InstallCastXMLCommand)' == ''">
+			<InstallCastXmlCommand>
+				<![CDATA[pip install castxml]]>
+			</InstallCastXmlCommand>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(GetCastXMLPathCommand)' == ''">
+			<GetCastXmlPathCommand>
+				<![CDATA[python -c "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'))"]]>
+			</GetCastXmlPathCommand>
+		</PropertyGroup>
 
+		<Exec Command="$(InstallCastXmlCommand)" />
+		<Exec Command="$(GetCastXmlPathCommand)" ConsoleToMSBuild="True" >
+			<Output TaskParameter="ConsoleOutput" PropertyName="CastXmlPath"/>
+		</Exec>
+		
+		<Message Importance="High" Text="$(CastXmlPath)"/>
+	</Target>
+		
 	<Choose>
 		<When Condition="'$(SharpGenIntermediateOutputDirectory)' == ''">
 			<Choose>
@@ -57,14 +77,12 @@
 			</PropertyGroup>
 		</When>
 		<Otherwise>
-			<PropertyGroup Condition="'$(CastXmlPath)' == ''">
-				<CastXmlPath>$([System.IO.Path]::Combine('$(SharpGenSdkToolsDirectory)', 'CastXML', 'bin', 'castxml.exe'))</CastXmlPath>
-			</PropertyGroup>
 			<PropertyGroup Condition="'$(SharpGenSdkAssemblyRuntimeIdentifier)' == ''">
 				<SharpGenSdkAssemblyRuntimeIdentifier>win</SharpGenSdkAssemblyRuntimeIdentifier>
 			</PropertyGroup>
 		</Otherwise>
 	</Choose>
+
 
 	<PropertyGroup Condition="'$(SharpGenSdkAssemblyFrameworkIdentifier)' == ''">
 		<SharpGenSdkAssemblyFrameworkIdentifier>net6.0</SharpGenSdkAssemblyFrameworkIdentifier>
@@ -77,10 +95,6 @@
 
 	<ItemGroup Condition="'@(SharpGenMapping)' != ''">
 		<CompilerVisibleProperty Include="SharpGenWaitForRoslynDebuggerAttach" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'@(SharpGenCastXml)' == ''">
-		<SharpGenCastXml Include="$(CastXmlPath)" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(CastXmlMSVCCompat)' != 'false'">
@@ -109,16 +123,17 @@
 				 RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)">
 			<Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
 		</MSBuild>
-	</Target>
-
+	</Target>	
+	
 	<Target Name="SharpGenGetMappingsFromProjectReferencesOuterBuild"
 			DependsOnTargets="_GetTargetFrameworksOutput"
 			Condition="'$(IsCrossTargetingBuild)' == 'true'">
+		
 		<MSBuild Projects="$(MSBuildProjectFullPath)"
 				 Targets="SharpGenGetMappingsFromProjectReferencesInnerBuild"
 				 BuildInParallel="$(BuildInParallel)"
 				 ContinueOnError="$(ContinueOnError)"
-				 Properties="TargetFramework=%(_TargetFrameworks.Identity);">
+				 Properties="TargetFramework=%(_TargetFrameworks.Identity)">
 			<Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
 		</MSBuild>
 	</Target>
@@ -161,7 +176,7 @@
     Since @(SharpGenInputsCache) is written before @(GeneratedCSharpFiles), it will ensure the next time project is built,
     it will pass target up-to-date checks.
   -->
-	<Target Name="SharpGenExecute">
+	<Target Name="SharpGenExecute" DependsOnTargets="InstallCastXml">
 		<ItemGroup Condition="'@(SharpGenPlatforms)' == '' and '$(RuntimeIdentifier)' != ''">
 			<SharpGenPlatforms Include="Windows" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
 			<SharpGenPlatforms Include="ItaniumSystemV" Condition="!$(RuntimeIdentifier.StartsWith('win'))" />
@@ -188,7 +203,7 @@
 		</ItemGroup>
 
 		<SharpGenTask CastXmlArguments="@(CastXmlArg)"
-					  CastXmlExecutable="@(SharpGenCastXml)"
+					  CastXmlExecutable="$(CastXmlPath)"
 					  ConfigFiles="@(SharpGenMapping);@(SharpGenConsumerMapping)"
 					  ConsumerBindMappingConfigId="$(SharpGenConsumerBindMappingConfigId)"
 					  DebugWaitForDebuggerAttach="$(SharpGenWaitForDebuggerAttach)"
