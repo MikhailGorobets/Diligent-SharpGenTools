@@ -63,7 +63,7 @@ public sealed partial class SharpGenTask
     private static string ComputeInputsCacheFileMetadata(string path)
     {
         FileInfo file = new(path);
-        Debug.Assert(file.Exists);
+        Debug.Assert(file.Exists, $"Path {path} is not exist");
 
         return $"{file.CreationTimeUtc.Ticks} {file.LastWriteTimeUtc.Ticks} {file.Length}";
     }

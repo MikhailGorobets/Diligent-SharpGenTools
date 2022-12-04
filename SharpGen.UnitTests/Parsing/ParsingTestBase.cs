@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using SharpGen.Config;
 using SharpGen.CppModel;
 using SharpGen.Parser;
@@ -12,7 +15,25 @@ namespace SharpGen.UnitTests.Parsing;
 
 public abstract class ParsingTestBase : FileSystemTestBase
 {
-    private static readonly string CastXmlDirectoryPath = Path.Combine("CastXML", "bin", "castxml.exe");
+    private static readonly string CastXmlDirectoryPath;
+
+    static ParsingTestBase()
+    {
+        var info = new ProcessStartInfo()
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            FileName = "python",
+            ArgumentList = {
+                "-c",
+                "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'), end ='')"
+            }
+        };
+
+        using var process = Process.Start(info);
+        using var reader = process.StandardOutput;
+        CastXmlDirectoryPath = reader.ReadToEnd();
+    }
 
     protected ParsingTestBase(ITestOutputHelper outputHelper) : base(outputHelper)
     {
@@ -47,14 +68,7 @@ public abstract class ParsingTestBase : FileSystemTestBase
         IncludeDirectoryResolver resolver = new(Ioc);
         resolver.Configure(config);
 
-        var rootPath = new DirectoryInfo(Environment.CurrentDirectory);
-        while (rootPath != null && !File.Exists(Path.Combine(rootPath.FullName, CastXmlDirectoryPath)))
-            rootPath = rootPath.Parent;
-
-        if (rootPath == null)
-            throw new InvalidOperationException("CastXML not found");
-
-        return new CastXmlRunner(resolver, Path.Combine(rootPath.FullName, CastXmlDirectoryPath),
+        return new CastXmlRunner(resolver, CastXmlDirectoryPath,
                                  additionalArguments ?? Array.Empty<string>(), Ioc)
         {
             OutputPath = TestDirectory.FullName
