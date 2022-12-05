@@ -1,12 +1,27 @@
 Param(
     [string] $Configuration = "Debug",
     [switch] $SkipUnitTests = $false,
-    [switch] $SkipOuterloopTests = $false
+    [switch] $SkipOuterloopTests = $false,
+    [switch] $NugetPublish = $false
 )
 
 $env:MSBuildEnableWorkloadResolver=$false
 
-dotnet pack -c $Configuration
+$PackageVersion = git describe --tags --abbrev=0
+
+if (!$NugetPublish) {
+    $PackageVersion = $PackageVersion + "-local"
+} 
+
+dotnet tool install -g dotnetCampus.TagToVersion
+
+dotnet TagToVersion -t $PackageVersion
+
+dotnet restore 
+
+dotnet build --no-restore --configuration $Configuration
+
+dotnet pack --no-restore --no-build --configuration $Configuration 
 
 if ($LastExitCode -ne 0) {
     exit 1
@@ -36,7 +51,7 @@ if (!$SkipUnitTests) {
     }
 }
 
-if (!$SkipOuterloopTests -and !($env:ReleaseTag -and ($Configuration -eq "Release"))) {
+if (!$SkipOuterloopTests) {
     Write-Debug "Deploying test packages"
     if (!(./build/deploy-test-packages -PackedConfiguration $Configuration -Project "SdkTests")) {
         Write-Error "Failed to deploy test packages"

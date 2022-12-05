@@ -1,163 +1,161 @@
 ﻿<Project InitialTargets="SharpGenCheckToolset">
 
-	<Target Name="SharpGenCheckToolset"
+    <Target Name="SharpGenCheckToolset"
 			Condition="'$(SharpGenEnableToolsetCheck)' != 'false'">
-		<Error Text="MSBuild version '$(MSBuildToolsVersion)' is not supported by SharpGenTools SDK."
+        <Error Text="MSBuild version '$(MSBuildToolsVersion)' is not supported by SharpGenTools SDK."
 			   File="$(MSBuildProjectFullPath)"
 			   Code="SD0004"
 			   Condition="'$(MSBuildToolsVersion)' != 'Current'" />
-		<Error Text="Only C# projects are supported by SharpGenTools SDK."
+        <Error Text="Only C# projects are supported by SharpGenTools SDK."
 			   File="$(MSBuildProjectFullPath)"
 			   Code="SD0007"
 			   Condition="'$(MSBuildProjectExtension)' != '.csproj'" />
-	</Target>
-		
-	<Target Name="InstallCastXml" Condition="'$(CastXmlPath)' == ''">
-		<PropertyGroup Condition="'$(InstallCastXMLCommand)' == ''">
-			<InstallCastXmlCommand>
-				<![CDATA[pip install castxml]]>
-			</InstallCastXmlCommand>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(GetCastXMLPathCommand)' == ''">
-			<GetCastXmlPathCommand>
-				<![CDATA[python -c "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'))"]]>
-			</GetCastXmlPathCommand>
-		</PropertyGroup>
+    </Target>
 
-		<Exec Command="$(InstallCastXmlCommand)" />
-		<Exec Command="$(GetCastXmlPathCommand)" ConsoleToMSBuild="True" >
-			<Output TaskParameter="ConsoleOutput" PropertyName="CastXmlPath"/>
-		</Exec>
-		
-		<Message Importance="High" Text="$(CastXmlPath)"/>
-	</Target>
-		
-	<Choose>
-		<When Condition="'$(SharpGenIntermediateOutputDirectory)' == ''">
-			<Choose>
-				<When Condition="$([System.IO.Path]::IsPathRooted('$(BaseIntermediateOutputPath)'))">
-					<PropertyGroup>
-						<SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(BaseIntermediateOutputPath)'))</SharpGenIntermediateOutputDirectory>
-					</PropertyGroup>
-				</When>
-				<Otherwise>
-					<PropertyGroup>
-						<SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)'))</SharpGenIntermediateOutputDirectory>
-					</PropertyGroup>
-				</Otherwise>
-			</Choose>
-		</When>
-		<When Condition="!$([System.IO.Path]::IsPathRooted('$(SharpGenIntermediateOutputDirectory)'))">
-			<PropertyGroup>
-				<SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(SharpGenIntermediateOutputDirectory)'))</SharpGenIntermediateOutputDirectory>
-			</PropertyGroup>
-		</When>
-		<When Condition="!HasTrailingSlash('$(SharpGenIntermediateOutputDirectory)')">
-			<PropertyGroup>
-				<SharpGenIntermediateOutputDirectory>$([MSBuild]::EnsureTrailingSlash('$(SharpGenIntermediateOutputDirectory)'))</SharpGenIntermediateOutputDirectory>
-			</PropertyGroup>
-		</When>
-	</Choose>
+    <Choose>
+        <When Condition="'$(SharpGenIntermediateOutputDirectory)' == ''">
+            <Choose>
+                <When Condition="$([System.IO.Path]::IsPathRooted('$(BaseIntermediateOutputPath)'))">
+                    <PropertyGroup>
+                        <SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(BaseIntermediateOutputPath)'))</SharpGenIntermediateOutputDirectory>
+                    </PropertyGroup>
+                </When>
+                <Otherwise>
+                    <PropertyGroup>
+                        <SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)'))</SharpGenIntermediateOutputDirectory>
+                    </PropertyGroup>
+                </Otherwise>
+            </Choose>
+        </When>
+        <When Condition="!$([System.IO.Path]::IsPathRooted('$(SharpGenIntermediateOutputDirectory)'))">
+            <PropertyGroup>
+                <SharpGenIntermediateOutputDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(SharpGenIntermediateOutputDirectory)'))</SharpGenIntermediateOutputDirectory>
+            </PropertyGroup>
+        </When>
+        <When Condition="!HasTrailingSlash('$(SharpGenIntermediateOutputDirectory)')">
+            <PropertyGroup>
+                <SharpGenIntermediateOutputDirectory>$([MSBuild]::EnsureTrailingSlash('$(SharpGenIntermediateOutputDirectory)'))</SharpGenIntermediateOutputDirectory>
+            </PropertyGroup>
+        </When>
+    </Choose>
 
-	<PropertyGroup>
-		<SharpGenConsumerBindMappingConfigId Condition="'$(SharpGenConsumerBindMappingConfigId)' == ''">$(AssemblyName)</SharpGenConsumerBindMappingConfigId>
+    <PropertyGroup>
+        <SharpGenConsumerBindMappingConfigId Condition="'$(SharpGenConsumerBindMappingConfigId)' == ''">$(AssemblyName)</SharpGenConsumerBindMappingConfigId>
 
-		<SharpGenSdkToolsDirectory Condition="'$(SharpGenSdkToolsDirectory)' == ''">$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'tools'))</SharpGenSdkToolsDirectory>
-		<CppStandard Condition="'$(CppStandard)' == ''">c++14</CppStandard>
-		<SharpGenWaitForDebuggerAttach Condition="'$(SharpGenWaitForDebuggerAttach)' == ''">false</SharpGenWaitForDebuggerAttach>
-		<SharpGenDocumentationFailuresAsErrors Condition="'$(SharpGenDocumentationFailuresAsErrors)' == ''">true</SharpGenDocumentationFailuresAsErrors>
+        <SharpGenSdkToolsDirectory Condition="'$(SharpGenSdkToolsDirectory)' == ''">$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'tools'))</SharpGenSdkToolsDirectory>
+        <CppStandard Condition="'$(CppStandard)' == ''">c++14</CppStandard>
+        <SharpGenWaitForDebuggerAttach Condition="'$(SharpGenWaitForDebuggerAttach)' == ''">false</SharpGenWaitForDebuggerAttach>
+        <SharpGenDocumentationFailuresAsErrors Condition="'$(SharpGenDocumentationFailuresAsErrors)' == ''">true</SharpGenDocumentationFailuresAsErrors>
 
-		<ContinueOnError Condition="'$(ContinueOnError)' == ''">false</ContinueOnError>
-	</PropertyGroup>
+        <ContinueOnError Condition="'$(ContinueOnError)' == ''">false</ContinueOnError>
+    </PropertyGroup>
 
-	<Choose>
-		<When Condition="$([MSBuild]::IsOsUnixLike())">
-			<PropertyGroup Condition="'$(SharpGenSdkAssemblyRuntimeIdentifier)' == ''">
-				<SharpGenSdkAssemblyRuntimeIdentifier>unix</SharpGenSdkAssemblyRuntimeIdentifier>
-			</PropertyGroup>
-		</When>
-		<Otherwise>
-			<PropertyGroup Condition="'$(SharpGenSdkAssemblyRuntimeIdentifier)' == ''">
-				<SharpGenSdkAssemblyRuntimeIdentifier>win</SharpGenSdkAssemblyRuntimeIdentifier>
-			</PropertyGroup>
-		</Otherwise>
-	</Choose>
+    <Choose>
+        <When Condition="$([MSBuild]::IsOsUnixLike())">
+            <PropertyGroup Condition="'$(SharpGenSdkAssemblyRuntimeIdentifier)' == ''">
+                <SharpGenSdkAssemblyRuntimeIdentifier>unix</SharpGenSdkAssemblyRuntimeIdentifier>
+            </PropertyGroup>
+        </When>
+        <Otherwise>
+            <PropertyGroup Condition="'$(SharpGenSdkAssemblyRuntimeIdentifier)' == ''">
+                <SharpGenSdkAssemblyRuntimeIdentifier>win</SharpGenSdkAssemblyRuntimeIdentifier>
+            </PropertyGroup>
+        </Otherwise>
+    </Choose>
 
 
-	<PropertyGroup Condition="'$(SharpGenSdkAssemblyFrameworkIdentifier)' == ''">
-		<SharpGenSdkAssemblyFrameworkIdentifier>net6.0</SharpGenSdkAssemblyFrameworkIdentifier>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(SharpGenSdkAssemblyFrameworkIdentifier)' == ''">
+        <SharpGenSdkAssemblyFrameworkIdentifier>net6.0</SharpGenSdkAssemblyFrameworkIdentifier>
+    </PropertyGroup>
 
-	<ItemGroup Condition="'@(SharpGenSdkAssembly)' == ''">
-		<SharpGenSdkAssembly Include="$([System.IO.Path]::Combine('$(SharpGenSdkToolsDirectory)', '$(SharpGenSdkAssemblyFrameworkIdentifier)', '$(SharpGenSdkAssemblyRuntimeIdentifier)', 'SharpGenTools.Sdk.dll'))" />
-		<Analyzer Include="$([System.IO.Path]::Combine('$(SharpGenSdkToolsDirectory)', '$(SharpGenSdkAssemblyFrameworkIdentifier)', '$(SharpGenSdkAssemblyRuntimeIdentifier)', 'SharpGen.Generator.dll'))" Condition="'@(SharpGenMapping)' != ''" />
-	</ItemGroup>
+    <ItemGroup Condition="'@(SharpGenSdkAssembly)' == ''">
+        <SharpGenSdkAssembly Include="$([System.IO.Path]::Combine('$(SharpGenSdkToolsDirectory)', '$(SharpGenSdkAssemblyFrameworkIdentifier)', '$(SharpGenSdkAssemblyRuntimeIdentifier)', 'SharpGenTools.Sdk.dll'))" />
+        <Analyzer Include="$([System.IO.Path]::Combine('$(SharpGenSdkToolsDirectory)', '$(SharpGenSdkAssemblyFrameworkIdentifier)', '$(SharpGenSdkAssemblyRuntimeIdentifier)', 'SharpGen.Generator.dll'))" Condition="'@(SharpGenMapping)' != ''" />
+    </ItemGroup>
 
-	<ItemGroup Condition="'@(SharpGenMapping)' != ''">
-		<CompilerVisibleProperty Include="SharpGenWaitForRoslynDebuggerAttach" />
-	</ItemGroup>
+    <ItemGroup Condition="'@(SharpGenMapping)' != ''">
+        <CompilerVisibleProperty Include="SharpGenWaitForRoslynDebuggerAttach" />
+    </ItemGroup>
 
-	<ItemGroup Condition="'$(CastXmlMSVCCompat)' != 'false'">
-		<CastXmlArg Include="-fmsc-version=1900" />
-		<CastXmlArg Include="-fms-extensions" />
-		<CastXmlArg Include="-fms-compatibility" />
-		<CastXmlArg Include="-Wno-microsoft-enum-value" />
-	</ItemGroup>
+    <ItemGroup Condition="'$(CastXmlMSVCCompat)' != 'false'">
+        <CastXmlArg Include="-fmsc-version=1900" />
+        <CastXmlArg Include="-fms-extensions" />
+        <CastXmlArg Include="-fms-compatibility" />
+        <CastXmlArg Include="-Wno-microsoft-enum-value" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<CastXmlArg Include="-std=$(CppStandard)" />
-	</ItemGroup>
+    <ItemGroup>
+        <CastXmlArg Include="-std=$(CppStandard)" />
+    </ItemGroup>
 
-	<UsingTask AssemblyFile="@(SharpGenSdkAssembly)" TaskName="SharpGenTask" />
+    <UsingTask AssemblyFile="@(SharpGenSdkAssembly)" TaskName="SharpGenTask" />
 
-	<Target Name="SharpGenGetMappingsFromProjectReferencesInnerBuild"
+    <Target Name="SharpGenInstallCastXml" Condition="'$(CastXmlPath)' == ''">
+        <PropertyGroup Condition="'$(InstallCastXMLCommand)' == ''">
+            <InstallCastXmlCommand>
+                <![CDATA[pip install castxml]]>
+            </InstallCastXmlCommand>
+        </PropertyGroup>
+        <PropertyGroup Condition="'$(GetCastXMLPathCommand)' == ''">
+            <GetCastXmlPathCommand>
+                <![CDATA[python -c "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'))"]]>
+            </GetCastXmlPathCommand>
+        </PropertyGroup>
+
+        <Exec Command="$(InstallCastXmlCommand)" />
+        <Exec Command="$(GetCastXmlPathCommand)" ConsoleToMSBuild="True" StandardOutputImportance="Low">
+            <Output TaskParameter="ConsoleOutput" PropertyName="CastXmlPath"/>
+        </Exec>
+    </Target>
+
+    <Target Name="SharpGenGetMappingsFromProjectReferencesInnerBuild"
 			DependsOnTargets="PrepareProjectReferences"
 			Condition="'$(IsCrossTargetingBuild)' != 'true'"
 			Returns="@(SharpGenConsumerMapping)">
-		<MSBuild Projects="@(_MSBuildProjectReferenceExistent)"
+        <MSBuild Projects="@(_MSBuildProjectReferenceExistent)"
 				 Targets="SharpGenGenerateConsumerBindMappingFile"
 				 BuildInParallel="$(BuildInParallel)"
 				 Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration); %(_MSBuildProjectReferenceExistent.SetPlatform);"
 				 SkipNonexistentTargets="true"
 				 ContinueOnError="$(ContinueOnError)"
 				 RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)">
-			<Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
-		</MSBuild>
-	</Target>	
-	
-	<Target Name="SharpGenGetMappingsFromProjectReferencesOuterBuild"
+            <Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
+        </MSBuild>
+    </Target>
+
+    <Target Name="SharpGenGetMappingsFromProjectReferencesOuterBuild"
 			DependsOnTargets="_GetTargetFrameworksOutput"
 			Condition="'$(IsCrossTargetingBuild)' == 'true'">
-		
-		<MSBuild Projects="$(MSBuildProjectFullPath)"
+
+        <MSBuild Projects="$(MSBuildProjectFullPath)"
 				 Targets="SharpGenGetMappingsFromProjectReferencesInnerBuild"
 				 BuildInParallel="$(BuildInParallel)"
 				 ContinueOnError="$(ContinueOnError)"
 				 Properties="TargetFramework=%(_TargetFrameworks.Identity)">
-			<Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
-		</MSBuild>
-	</Target>
+            <Output TaskParameter="TargetOutputs" ItemName="SharpGenConsumerMapping" />
+        </MSBuild>
+    </Target>
 
-	<!-- The up-to-date check for this target will always yield FullBuild result since it has no inputs specification -->
-	<Target Name="SharpGenGenerateConsumerProps"
+    <!-- The up-to-date check for this target will always yield FullBuild result since it has no inputs specification -->
+    <Target Name="SharpGenGenerateConsumerProps"
 			DependsOnTargets="SharpGenGenerateConsumerBindMappingFile"
 			Outputs="@(TfmConsumerProps)"
 			Condition="'$(SharpGenGenerateConsumerBindMapping)' != 'false'">
-		<ItemGroup>
-			<None Include="@(SharpGenConsumerBindMappingFile)" />
-			<None Include="$(SharpGenProfilePath)Package.props">
-				<PackagePath>build/$(PackageId).props;buildMultiTargeting/$(PackageId).props</PackagePath>
-				<Pack>true</Pack>
-			</None>
-		</ItemGroup>
-	</Target>
+        <ItemGroup>
+            <None Include="@(SharpGenConsumerBindMappingFile)" />
+            <None Include="$(SharpGenProfilePath)Package.props">
+                <PackagePath>build/$(PackageId).props;buildMultiTargeting/$(PackageId).props</PackagePath>
+                <Pack>true</Pack>
+            </None>
+        </ItemGroup>
+    </Target>
 
-	<Target Name="GenerateSharpGenBindings"
+    <Target Name="GenerateSharpGenBindings"
 			BeforeTargets="BeforeCompile;CoreCompile"
 			Condition="'@(SharpGenMapping)' != ''"
 			DependsOnTargets="@(GenerateSharpGenBindingsDependsOn)" />
 
-	<!--
+    <!--
     TODO: fix up docs
 
     What is the deal with @(SharpGenInputsCache)?
@@ -176,33 +174,33 @@
     Since @(SharpGenInputsCache) is written before @(GeneratedCSharpFiles), it will ensure the next time project is built,
     it will pass target up-to-date checks.
   -->
-	<Target Name="SharpGenExecute" DependsOnTargets="InstallCastXml">
-		<ItemGroup Condition="'@(SharpGenPlatforms)' == '' and '$(RuntimeIdentifier)' != ''">
-			<SharpGenPlatforms Include="Windows" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
-			<SharpGenPlatforms Include="ItaniumSystemV" Condition="!$(RuntimeIdentifier.StartsWith('win'))" />
-		</ItemGroup>
+    <Target Name="SharpGenExecute">
+        <ItemGroup Condition="'@(SharpGenPlatforms)' == '' and '$(RuntimeIdentifier)' != ''">
+            <SharpGenPlatforms Include="Windows" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+            <SharpGenPlatforms Include="ItaniumSystemV" Condition="!$(RuntimeIdentifier.StartsWith('win'))" />
+        </ItemGroup>
 
-		<ItemGroup>
-			<_SharpGenMappingNonexistent Include="@(SharpGenMapping)" Condition="!Exists('%(Identity)')" />
-			<_SharpGenConsumerMappingNonexistent Include="@(SharpGenConsumerMapping)" Condition="!Exists('%(Identity)')" />
-		</ItemGroup>
+        <ItemGroup>
+            <_SharpGenMappingNonexistent Include="@(SharpGenMapping)" Condition="!Exists('%(Identity)')" />
+            <_SharpGenConsumerMappingNonexistent Include="@(SharpGenConsumerMapping)" Condition="!Exists('%(Identity)')" />
+        </ItemGroup>
 
-		<!-- Issue a warning for each non-existent mapping file. -->
-		<Warning Text="The referenced SharpGen mapping file '%(_SharpGenMappingNonexistent.Identity)' does not exist. This is likely an error in your project file."
+        <!-- Issue a warning for each non-existent mapping file. -->
+        <Warning Text="The referenced SharpGen mapping file '%(_SharpGenMappingNonexistent.Identity)' does not exist. This is likely an error in your project file."
 				 File="$(MSBuildProjectFullPath)"
 				 Code="SD0005"
 				 Condition="'@(_SharpGenMappingNonexistent)' != ''"/>
-		<Warning Text="The referenced SharpGen consumer mapping file '%(_SharpGenConsumerMappingNonexistent.Identity)' does not exist. Check your referenced packages and projects."
+        <Warning Text="The referenced SharpGen consumer mapping file '%(_SharpGenConsumerMappingNonexistent.Identity)' does not exist. Check your referenced packages and projects."
 				 File="$(MSBuildProjectFullPath)"
 				 Code="SD0006"
 				 Condition="'@(_SharpGenConsumerMappingNonexistent)' != ''"/>
 
-		<ItemGroup>
-			<_SharpGenMappingNonexistent Remove="@(_SharpGenMappingNonexistent)" />
-			<_SharpGenConsumerMappingNonexistent Remove="@(_SharpGenConsumerMappingNonexistent)" />
-		</ItemGroup>
+        <ItemGroup>
+            <_SharpGenMappingNonexistent Remove="@(_SharpGenMappingNonexistent)" />
+            <_SharpGenConsumerMappingNonexistent Remove="@(_SharpGenConsumerMappingNonexistent)" />
+        </ItemGroup>
 
-		<SharpGenTask CastXmlArguments="@(CastXmlArg)"
+        <SharpGenTask CastXmlArguments="@(CastXmlArg)"
 					  CastXmlExecutable="$(CastXmlPath)"
 					  ConfigFiles="@(SharpGenMapping);@(SharpGenConsumerMapping)"
 					  ConsumerBindMappingConfigId="$(SharpGenConsumerBindMappingConfigId)"
@@ -217,85 +215,85 @@
 					  Platforms="@(SharpGenPlatforms)"
 					  RuntimeIdentifier="$(RuntimeIdentifier)"
 					  SilenceMissingDocumentationErrorIdentifierPatterns="@(SharpGenSilenceMissingDocumentationErrorIdentifierPatterns)">
-			<Output TaskParameter="ProfilePath"
+            <Output TaskParameter="ProfilePath"
 					PropertyName="SharpGenProfilePath" />
-		</SharpGenTask>
+        </SharpGenTask>
 
-		<!-- Bonus: these don't show up in IDE file tree (no clutter) -->
-		<ItemGroup>
-			<Compile Include="$(SharpGenProfilePath)SharpGen.Bindings.g.cs" />
-			<SharpGenConsumerBindMappingFile Include="$(SharpGenProfilePath)$(SharpGenConsumerBindMappingConfigId).BindMapping.xml">
-				<PackagePath>build</PackagePath>
-				<Pack>true</Pack>
-			</SharpGenConsumerBindMappingFile>
-		</ItemGroup>
-	</Target>
+        <!-- Bonus: these don't show up in IDE file tree (no clutter) -->
+        <ItemGroup>
+            <Compile Include="$(SharpGenProfilePath)SharpGen.Bindings.g.cs" />
+            <SharpGenConsumerBindMappingFile Include="$(SharpGenProfilePath)$(SharpGenConsumerBindMappingConfigId).BindMapping.xml">
+                <PackagePath>build</PackagePath>
+                <Pack>true</Pack>
+            </SharpGenConsumerBindMappingFile>
+        </ItemGroup>
+    </Target>
 
-	<Target Name="SharpGenGenerateConsumerBindMappingFile"
+    <Target Name="SharpGenGenerateConsumerBindMappingFile"
 			Returns="@(SharpGenConsumerBindMappingFile)"
 			DependsOnTargets="GenerateSharpGenBindings"
 			Condition="'$(SharpGenGenerateConsumerBindMapping)' != 'false' and '@(SharpGenMapping)' != ''" />
 
-	<Target Name="SharpGenClean" BeforeTargets="CoreClean">
-		<ItemGroup>
-			<Clean Include="$(SharpGenIntermediateOutputDirectory)SharpGen-*" />
-		</ItemGroup>
-	</Target>
+    <Target Name="SharpGenClean" BeforeTargets="CoreClean">
+        <ItemGroup>
+            <Clean Include="$(SharpGenIntermediateOutputDirectory)SharpGen-*" />
+        </ItemGroup>
+    </Target>
 
-	<!--
+    <!--
     ============================================================
               IncludeSharpGenRuntimePackageReference
 
-              Add SharpGen.Runtime package reference
+              Add Diligent-SharpGen.Runtime package reference
     ============================================================
     -->
-	<Target Name="IncludeSharpGenRuntimePackageReference"
+    <Target Name="IncludeSharpGenRuntimePackageReference"
 			BeforeTargets="_CheckForInvalidConfigurationAndPlatform;CollectPackageReferences"
 			Condition="'$(SharpGenIncludeRuntimePackageReference)' != 'false'">
-		<ItemGroup>
-			<_ExistingSharpGenRuntimePackageReference Include="@(PackageReference)"
-													  Condition="'%(PackageReference.Identity)' == 'SharpGen.Runtime'" />
-		</ItemGroup>
+        <ItemGroup>
+            <_ExistingSharpGenRuntimePackageReference Include="@(PackageReference)"
+													  Condition="'%(PackageReference.Identity)' == 'Diligent-SharpGen.Runtime'" />
+        </ItemGroup>
 
-		<ItemGroup Condition="'$(SharpGenSdkUsedAsPackageReference)' != 'true'">
-			<PackageReference Include="SharpGen.Runtime"
+        <ItemGroup Condition="'$(SharpGenSdkUsedAsPackageReference)' != 'true'">
+            <PackageReference Include="Diligent-SharpGen.Runtime"
 							  Version="$(SharpGenSdkVersion)"
 							  IsImplicitlyDefined="true"
 							  Condition="'@(_ExistingSharpGenRuntimePackageReference)' == ''" />
-		</ItemGroup>
+        </ItemGroup>
 
-		<Warning Text="SharpGen.Runtime is implicitly referenced by the SharpGenTools MSBuild SDK. Avoid referencing it explicitly to prevent version mismatch issues."
+        <Warning Text="Diligent-SharpGen.Runtime is implicitly referenced by the SharpGenTools MSBuild SDK. Avoid referencing it explicitly to prevent version mismatch issues."
 				 File="$(MSBuildProjectFullPath)"
 				 Code="SD0001"
 				 Condition="'$(SharpGenDisableExistingRuntimePackageReferenceWarning)' != 'true' and '@(_ExistingSharpGenRuntimePackageReference)' != '' and '$(SharpGenSdkUsedAsPackageReference)' != 'true'" />
 
-		<Error Text="SharpGen.Runtime is implicitly referenced only when SharpGenTools is used as a MSBuild SDK. Set SharpGenIncludeRuntimePackageReference to false, add SharpGen.Runtime PackageReference, or switch to importing SharpGenTools as a MSBuild SDK."
+        <Error Text="Diligent-SharpGen.Runtime is implicitly referenced only when SharpGenTools is used as a MSBuild SDK. Set SharpGenIncludeRuntimePackageReference to false, add Diligent-SharpGen.Runtime PackageReference, or switch to importing SharpGenTools as a MSBuild SDK."
 			   File="$(MSBuildProjectFullPath)"
 			   Code="SD0002"
 			   Condition="'$(SharpGenSdkUsedAsPackageReference)' == 'true' and '@(_ExistingSharpGenRuntimePackageReference)' == ''" />
-	</Target>
+    </Target>
 
-	<!--
+    <!--
     ============================================================
               IncludeSharpGenExtensionPackageReferences
 
        Add package references for @(SharpGenExtensionPackage)
     ============================================================
     -->
-	<Target Name="IncludeSharpGenExtensionPackageReferences"
+    <Target Name="IncludeSharpGenExtensionPackageReferences"
 			BeforeTargets="_CheckForInvalidConfigurationAndPlatform;CollectPackageReferences"
 			Condition="'@(SharpGenExtensionPackage)' != ''">
-		<ItemGroup Condition="'$(SharpGenSdkUsedAsPackageReference)' != 'true'">
-			<PackageReference Include="@(SharpGenExtensionPackage)"
+        <ItemGroup Condition="'$(SharpGenSdkUsedAsPackageReference)' != 'true'">
+            <PackageReference Include="@(SharpGenExtensionPackage)"
 							  Version="%(SharpGenExtensionPackage.Version)"
 							  IsImplicitlyDefined="true"
 							  PrivateAssets="All" />
-		</ItemGroup>
+        </ItemGroup>
 
-		<Error Text="SharpGenExtensionPackage only works when SharpGenTools is used as a MSBuild SDK."
+        <Error Text="SharpGenExtensionPackage only works when SharpGenTools is used as a MSBuild SDK."
 			   File="$(MSBuildProjectFullPath)"
 			   Code="SD0003"
 			   Condition="'$(SharpGenSdkUsedAsPackageReference)' == 'true' and '$(SharpGenDisableSharpGenExtensionPackageForPackageReferenceSdkError)' != 'true'" />
-	</Target>
+    </Target>
 
 </Project>

@@ -1,5 +1,0 @@
-﻿<Project>
-  <ItemGroup>
-    <SharpGenConsumerMapping Include="$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)', '..', 'build', 'Mapping.xml'))" />
-  </ItemGroup>
-</Project>

@@ -1,4 +1,5 @@
 <Project>
+	
 	<PropertyGroup>
 		<Platforms>x86;x64</Platforms>
 		<IsPackable>false</IsPackable>
@@ -25,8 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
-		<PackageReference Include="SharpGenTools.Sdk" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true" PrivateAssets="All"/>
+        <PackageReference Include="Diligent-SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
+        <PackageReference Include="Diligent-SharpGenTools.Sdk" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true" PrivateAssets="All"/>
 
 		<PackageReference Include="coverlet.msbuild"/>
 		<PackageReference Include="Microsoft.NET.Test.Sdk"/>

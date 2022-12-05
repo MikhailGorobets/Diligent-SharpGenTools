@@ -1,20 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<PublishTrimmed>true</PublishTrimmed>
-		<IsPackable>false</IsPackable>
-	</PropertyGroup>
+    <Sdk Name="Microsoft.Build.CentralPackageVersions" />
 
-	<ItemGroup>
-		<ProjectReference Include="..\SharpGen.Runtime\SharpGen.Runtime.csproj" />
-	</ItemGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net6.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishTrimmed>true</PublishTrimmed>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<TrimmerRootAssembly Include="SharpGen.Runtime" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SharpGen.Runtime\SharpGen.Runtime.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <TrimmerRootAssembly Include="SharpGen.Runtime" />
+    </ItemGroup>
 
 </Project>
