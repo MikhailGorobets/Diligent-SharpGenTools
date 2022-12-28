@@ -19,19 +19,7 @@ if ($LastExitCode -ne 0) {
     exit 1
 }
 
-Write-Debug "Deploying built packages for COM Runtime build"
-if (!(./build/deploy-test-packages -PackedConfiguration $Configuration -Project "SharpGen.Runtime.COM")) {
-    Write-Error "Failed to deploy packages"
-    exit 1
-}
-
 $RepoRoot = Split-Path -parent $PSCommandPath
-
-Write-Debug "COM Runtime build"
-if (!(./build/build-com-runtime -Configuration $Configuration -RepoRoot $RepoRoot)) {
-    Write-Error "COM Runtime build failed"
-    exit 1
-}
 
 mkdir $RepoRoot/artifacts/coverage -ErrorAction SilentlyContinue
 

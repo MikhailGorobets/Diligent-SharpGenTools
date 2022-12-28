@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="InstallCastXml">
 
     <Sdk Name="Microsoft.Build.CentralPackageVersions" />
 
@@ -23,5 +23,14 @@
         <PackageReference Include="Xunit.SkippableFact" />
         <PackageReference Include="System.Text.Json" />
     </ItemGroup>
+
+    <Target Name="InstallCastXml" Condition="'$(InstallCastXMLCommand)' == ''">
+        <PropertyGroup>
+            <InstallCastXmlCommand>
+                <![CDATA[pip install castxml]]>
+            </InstallCastXmlCommand>
+        </PropertyGroup>
+        <Exec Command="$(InstallCastXmlCommand)"/>
+    </Target>
 
 </Project>
