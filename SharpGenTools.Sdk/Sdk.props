@@ -21,6 +21,7 @@
     <ItemGroup>
         <GenerateSharpGenBindingsDependsOn Include="PrepareProjectReferences" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
         <GenerateSharpGenBindingsDependsOn Include="PrepareForBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
+        <GenerateSharpGenBindingsDependsOn Include="SharpGenInstallCastXml" />
         <GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesInnerBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
         <GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesOuterBuild" Condition="'$(IsCrossTargetingBuild)' == 'true'" />
         <GenerateSharpGenBindingsDependsOn Include="SharpGenExecute" />
