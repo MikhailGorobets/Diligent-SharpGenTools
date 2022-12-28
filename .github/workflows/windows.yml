@@ -1,9 +1,9 @@
-name: Windows
+name: Windows build
 
 on: [push, pull_request]
 
 env:
-  MSBuildEnableWorkloadResolver: false    
+  MSBuildEnableWorkloadResolver: false
 
 jobs:
   build-win10:

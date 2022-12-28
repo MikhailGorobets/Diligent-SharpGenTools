@@ -1,0 +1,42 @@
+name: Publish Nuget packages
+
+on: 
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+      
+env:
+  MSBuildEnableWorkloadResolver: false
+  NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
+
+jobs:
+  deploy:
+    runs-on: windows-latest    
+    name: Nuget package deployment
+    
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Build and test
+      working-directory: ${{github.workspace}}
+      run: ./build.ps1 -Configuration Release -NugetPublish true
+
+    - name: Copy NuGet packages to Artifact staging directory
+      run: ./copy-nuget-artifacts.ps1
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        path: ${{github.workspace}}/artifacts
+        name: Artifacts
+        if-no-files-found: error
+
+    - name: Publish NuGet packages
+      run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_AUTH_TOKEN}} -s ${{env.NUGET_SOURCE_URL}}
+      working-directory: ${{github.workspace}}/artifacts/nuget-packages

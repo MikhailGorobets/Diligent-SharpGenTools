@@ -1,9 +1,11 @@
 Param(
     [string] $Configuration = "Debug",
+    [switch] $NugetPublish = $false,
     [switch] $SkipUnitTests = $false,
-    [switch] $SkipOuterloopTests = $false,
-    [switch] $NugetPublish = $false
+    [switch] $SkipOuterloopTests = $false
 )
+
+$env:MSBuildEnableWorkloadResolver=$false
 
 $PackageVersion = git describe --tags --abbrev=0
 
@@ -11,7 +13,9 @@ if (!$NugetPublish) {
     $PackageVersion = $PackageVersion + "-local"
 } 
 
-$env:MSBuildEnableWorkloadResolver=$false
+dotnet tool install -g dotnetCampus.TagToVersion
+
+dotnet TagToVersion -t $PackageVersion
 
 dotnet pack -c $Configuration
 
