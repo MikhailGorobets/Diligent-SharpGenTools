@@ -5,7 +5,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net6.0</TargetFrameworks>
-        <PackageId>SharpGenTools.Sdk</PackageId>
+        <PackageId>Diligent-SharpGenTools.Sdk</PackageId>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 
@@ -65,8 +65,8 @@
         <Content Include="SharpGenMapping.xaml" PackagePath="build" />
         <Content Include="Sdk.props" PackagePath="Sdk" />
         <Content Include="Sdk.targets" PackagePath="Sdk" />
-        <Content Include="SharpGenTools.Sdk.props" PackagePath="build;buildMultiTargeting" />
-        <Content Include="SharpGenTools.Sdk.targets" PackagePath="build;buildMultiTargeting" />
+        <Content Include="$(PackageId).props" PackagePath="build;buildMultiTargeting" />
+        <Content Include="$(PackageId).targets" PackagePath="build;buildMultiTargeting" />
     </ItemGroup>
 
     <Target Name="SharpGenWriteVersionProps" BeforeTargets="_GetPackageFiles;GenerateNuspec" Outputs="@(SdkVersionProps)">

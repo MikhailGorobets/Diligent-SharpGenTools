@@ -11,11 +11,12 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>preview</AnalysisLevel>
+        <PackageId>Diligent-SharpGen.Runtime</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
         <Content Include="Mapping.xml" PackagePath="build" />
-        <Content Include="SharpGen.Runtime.props" PackagePath="build;buildMultiTargeting" />
+        <Content Include="$(PackageId).props" PackagePath="build;buildMultiTargeting" />
         <Compile Remove="Shim/Formattable*" />
         <Compile Remove="Shim/ReferenceEqualityComparer.cs" />
     </ItemGroup>
