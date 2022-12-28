@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Interface.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyOriginatorKeyFile>Interface.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Reactive" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Reactive" />
+    </ItemGroup>
 
 </Project>

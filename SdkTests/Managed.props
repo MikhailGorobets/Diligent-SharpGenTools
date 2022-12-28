@@ -1,77 +1,77 @@
 <Project>
-	<PropertyGroup>
-		<Platforms>x86;x64</Platforms>
-		<IsPackable>false</IsPackable>
-		<RestoreNoCache>true</RestoreNoCache>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<SdkTestNative>$(MSBuildProjectName)</SdkTestNative>
-		<SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
-	</PropertyGroup>
+    <PropertyGroup>
+        <Platforms>x86;x64</Platforms>
+        <IsPackable>false</IsPackable>
+        <RestoreNoCache>true</RestoreNoCache>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <SdkTestNative>$(MSBuildProjectName)</SdkTestNative>
+        <SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' and '$(VisualStudioVersion)' != ''">
-		<TargetFramework>net6.0</TargetFramework>
-		<TargetPlatform>x86</TargetPlatform>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' and '$(VisualStudioVersion)' != ''">
+        <TargetFramework>net6.0</TargetFramework>
+        <TargetPlatform>x86</TargetPlatform>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true'">
-		<TargetFrameworks>net6.0</TargetFrameworks>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true'">
+        <TargetFrameworks>net6.0</TargetFrameworks>
+    </PropertyGroup>
 
-	<ItemGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true' and '$(MSBuildProjectName)' != 'Struct'">
-		<ProjectReference Include="..\Struct\Struct.csproj" />
-	</ItemGroup>
+    <ItemGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true' and '$(MSBuildProjectName)' != 'Struct'">
+        <ProjectReference Include="..\Struct\Struct.csproj" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
-		<PackageReference Include="SharpGenTools.Sdk" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true" PrivateAssets="All"/>
+    <ItemGroup>
+        <PackageReference Include="SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
+        <PackageReference Include="SharpGenTools.Sdk" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true" PrivateAssets="All"/>
 
-		<PackageReference Include="coverlet.msbuild"/>
-		<PackageReference Include="Microsoft.NET.Test.Sdk"/>
-		<PackageReference Include="xunit"/>
-		<PackageReference Include="xunit.runner.visualstudio"/>
-		<PackageReference Include="Xunit.SkippableFact"/>
+        <PackageReference Include="coverlet.msbuild"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="Xunit.SkippableFact"/>
 
-		<SharpGenMapping Include="Mapping.xml"/>
+        <SharpGenMapping Include="Mapping.xml"/>
 
-		<Compile Include="$(MSBuildThisFileDirectory)RuntimeConfigurationInitializer.cs"/>
-	</ItemGroup>
+        <Compile Include="$(MSBuildThisFileDirectory)RuntimeConfigurationInitializer.cs"/>
+    </ItemGroup>
 
-	<Target Name="SharpGenSetRoslynGeneratedPath">
-		<PropertyGroup>
-			<CompilerGeneratedFilesOutputPath>$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
-		</PropertyGroup>
-	</Target>
+    <Target Name="SharpGenSetRoslynGeneratedPath">
+        <PropertyGroup>
+            <CompilerGeneratedFilesOutputPath>$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+        </PropertyGroup>
+    </Target>
 
-	<Target Name="SharpGenSdkTestsSetDebuggerAttach" BeforeTargets="SharpGenExecute" Condition="'$(SdkTestsDebuggerAttach)' == 'true'">
-		<PropertyGroup>
-			<SharpGenWaitForDebuggerAttach>true</SharpGenWaitForDebuggerAttach>
-		</PropertyGroup>
-	</Target>
+    <Target Name="SharpGenSdkTestsSetDebuggerAttach" BeforeTargets="SharpGenExecute" Condition="'$(SdkTestsDebuggerAttach)' == 'true'">
+        <PropertyGroup>
+            <SharpGenWaitForDebuggerAttach>true</SharpGenWaitForDebuggerAttach>
+        </PropertyGroup>
+    </Target>
 
-	<Target Name="SharpGenSdkTestsClearDebuggerAttach" AfterTargets="SharpGenExecute" Condition="'$(SdkTestsDebuggerAttach)' == 'true'">
-		<PropertyGroup>
-			<SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
-		</PropertyGroup>
-	</Target>
+    <Target Name="SharpGenSdkTestsClearDebuggerAttach" AfterTargets="SharpGenExecute" Condition="'$(SdkTestsDebuggerAttach)' == 'true'">
+        <PropertyGroup>
+            <SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
+        </PropertyGroup>
+    </Target>
 
-	<Target Name="SharpGenSdkTestsVerifyTFM" BeforeTargets="BeforeCompile;CoreCompile">
-		<Error Text="TFM not set properly"
+    <Target Name="SharpGenSdkTestsVerifyTFM" BeforeTargets="BeforeCompile;CoreCompile">
+        <Error Text="TFM not set properly"
                Condition="'$(TargetFramework)' != 'net6.0'"/>
-		<Error Text="TP not set properly"
+        <Error Text="TP not set properly"
                Condition="'$(TargetPlatform)' != 'x86' and '$(TargetPlatform)' != 'x64'"/>
-	</Target>
+    </Target>
 
-	<Target Name="_ResolveCopyLocalNuGetPackagePdbsAndXml" AfterTargets="ResolveReferences">
-		<ItemGroup>
-			<ReferenceCopyLocalPaths
+    <Target Name="_ResolveCopyLocalNuGetPackagePdbsAndXml" AfterTargets="ResolveReferences">
+        <ItemGroup>
+            <ReferenceCopyLocalPaths
                     Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).pdb')"
                     Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != '' and Exists('%(RootDir)%(Directory)%(Filename).pdb')"/>
-			<ReferenceCopyLocalPaths
+            <ReferenceCopyLocalPaths
                     Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')"
                     Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != '' and Exists('%(RootDir)%(Directory)%(Filename).xml')"/>
-		</ItemGroup>
-	</Target>
+        </ItemGroup>
+    </Target>
 </Project>

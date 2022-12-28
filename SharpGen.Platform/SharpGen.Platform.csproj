@@ -4,7 +4,7 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
-		<TargetFrameworks>net6.0</TargetFrameworks>
+        <TargetFrameworks>net6.0</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -27,27 +27,27 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Documentation\DocConverterUtilities.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Documentation\DocItemCache.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Documentation\DocItem.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Documentation\DocItemConverter.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Documentation\DocSubItemConverter.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Documentation\DocSubItem.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="ObservableSet.cs">
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Documentation\DocConverterUtilities.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Documentation\DocItemCache.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Documentation\DocItem.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Documentation\DocItemConverter.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Documentation\DocSubItemConverter.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Documentation\DocSubItem.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="ObservableSet.cs">
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 </Project>

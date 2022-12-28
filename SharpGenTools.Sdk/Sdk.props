@@ -1,29 +1,29 @@
 ﻿<Project>
 
-	<PropertyGroup>
-		<BeforePack Condition="'$(BeforePack)' != ''">$(BeforePack);SharpGenGenerateConsumerBindMappingFile;SharpGenGenerateConsumerProps</BeforePack>
-		<BeforePack Condition="'$(BeforePack)' == ''">SharpGenGenerateConsumerBindMappingFile;SharpGenGenerateConsumerProps</BeforePack>
-	</PropertyGroup>
+    <PropertyGroup>
+        <BeforePack Condition="'$(BeforePack)' != ''">$(BeforePack);SharpGenGenerateConsumerBindMappingFile;SharpGenGenerateConsumerProps</BeforePack>
+        <BeforePack Condition="'$(BeforePack)' == ''">SharpGenGenerateConsumerBindMappingFile;SharpGenGenerateConsumerProps</BeforePack>
+    </PropertyGroup>
 
-	<Import Project="$(MSBuildThisFileDirectory)Sdk.Version.props" />
+    <Import Project="$(MSBuildThisFileDirectory)Sdk.Version.props" />
 
-	<ItemDefinitionGroup>
-		<SharpGenMapping>
-			<Generator>MSBuild:Compile</Generator>
-		</SharpGenMapping>
-	</ItemDefinitionGroup>
+    <ItemDefinitionGroup>
+        <SharpGenMapping>
+            <Generator>MSBuild:Compile</Generator>
+        </SharpGenMapping>
+    </ItemDefinitionGroup>
 
-	<ItemGroup>
-		<AvailableItemName Include="SharpGenMapping" />
-		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)../build/SharpGenMapping.xaml" />
-	</ItemGroup>
+    <ItemGroup>
+        <AvailableItemName Include="SharpGenMapping" />
+        <PropertyPageSchema Include="$(MSBuildThisFileDirectory)../build/SharpGenMapping.xaml" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<GenerateSharpGenBindingsDependsOn Include="PrepareProjectReferences" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
-		<GenerateSharpGenBindingsDependsOn Include="PrepareForBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
-		<GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesInnerBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
-		<GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesOuterBuild" Condition="'$(IsCrossTargetingBuild)' == 'true'" />
-		<GenerateSharpGenBindingsDependsOn Include="SharpGenExecute" />
-	</ItemGroup>
+    <ItemGroup>
+        <GenerateSharpGenBindingsDependsOn Include="PrepareProjectReferences" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
+        <GenerateSharpGenBindingsDependsOn Include="PrepareForBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
+        <GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesInnerBuild" Condition="'$(IsCrossTargetingBuild)' != 'true'" />
+        <GenerateSharpGenBindingsDependsOn Include="SharpGenGetMappingsFromProjectReferencesOuterBuild" Condition="'$(IsCrossTargetingBuild)' == 'true'" />
+        <GenerateSharpGenBindingsDependsOn Include="SharpGenExecute" />
+    </ItemGroup>
 
 </Project>

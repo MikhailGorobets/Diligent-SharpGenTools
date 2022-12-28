@@ -1,19 +1,19 @@
 <Project>
 
-  <PropertyGroup>
-    <BuildingSdkTests>true</BuildingSdkTests>
-    <SharpGenEnablePackageReferenceCheck>false</SharpGenEnablePackageReferenceCheck>
-    <MicrosoftCommonPropsHasBeenImported>true</MicrosoftCommonPropsHasBeenImported>
-  </PropertyGroup>
+    <PropertyGroup>
+        <BuildingSdkTests>true</BuildingSdkTests>
+        <SharpGenEnablePackageReferenceCheck>false</SharpGenEnablePackageReferenceCheck>
+        <MicrosoftCommonPropsHasBeenImported>true</MicrosoftCommonPropsHasBeenImported>
+    </PropertyGroup>
 
-  <Import Project="Sdk.props" Sdk="Microsoft.Build.CentralPackageVersions" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
+    <Import Project="Sdk.props" Sdk="Microsoft.Build.CentralPackageVersions" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
 
-  <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.props" />
+    <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.props" />
 
-  <PropertyGroup>
-    <LocalPackageVersion>$(Version)</LocalPackageVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <LocalPackageVersion>$(Version)</LocalPackageVersion>
+    </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)Managed.props" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
+    <Import Project="$(MSBuildThisFileDirectory)Managed.props" Condition="'$(MSBuildProjectExtension)' == '.csproj'" />
 
 </Project>

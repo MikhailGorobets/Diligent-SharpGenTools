@@ -1,62 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config id="Interface" xmlns="urn:SharpGen.Config">
-  <namespace>Interface</namespace>
-  <assembly>Interface</assembly>
+	<namespace>Interface</namespace>
+	<assembly>Interface</assembly>
 
-  <sdk name="StdLib" />
+	<sdk name="StdLib" />
 
-  <include-dir>$(THIS_CONFIG_PATH)\..\Native\Interface</include-dir>
-  <include file="InterfaceNative.h" attach="true" />
+	<include-dir>$(THIS_CONFIG_PATH)\..\Native\Interface</include-dir>
+	<include file="InterfaceNative.h" attach="true" />
 
-  <extension>
-    <create class="Interface.Functions" visibility="public static" />
-  </extension>
+	<extension>
+		<create class="Interface.Functions" visibility="public static" />
+	</extension>
 
-  <bindings>
-    <bind from="RESULT" to="SharpGen.Runtime.Result" />
-    <bind from="SHARPGEN_RUNTIME_SEEKORIGIN" to="System.IO.SeekOrigin" />
-  </bindings>
+	<bindings>
+		<bind from="RESULT" to="SharpGen.Runtime.Result" />
+		<bind from="SHARPGEN_RUNTIME_SEEKORIGIN" to="System.IO.SeekOrigin" />
+	</bindings>
 
-  <mapping>
-    <map interface="IInterface" callback="true" callback-dual="true" callback-name="CppImplementation" name="NativeInterface" callback-visibility="public" />
-    <map interface="IInterface2" name="NativeInterface2" />
-    <map function=".*" dll='"InterfaceNative.dll"' group="Interface.Functions" />
-    <map param="IInterface2::AddToThis::interfaces" attribute="in buffer" />
-    <move method="ILargeInterface::Method3" to="InnerInterface" property="Inner" />
-    <map method="InterfaceWithProperties::(.*)" custom-vtbl="true" />
-    <map param="InterfaceWithProperties::GetValue2(.*)::(.*)" attribute="out" />
-    <map param="InterfaceWithProperties::IsTrueOutProp::(.*)" attribute="out" />
-    <map method="InterfaceWithProperties::(.+)Persistent" persist="true" />
+	<mapping>
+		<map interface="IInterface" callback="true" callback-dual="true" callback-name="CppImplementation" name="NativeInterface" callback-visibility="public" />
+		<map interface="IInterface2" name="NativeInterface2" />
+		<map function=".*" dll='"InterfaceNative.dll"' group="Interface.Functions" />
+		<map param="IInterface2::AddToThis::interfaces" attribute="in buffer" />
+		<move method="ILargeInterface::Method3" to="InnerInterface" property="Inner" />
+		<map method="InterfaceWithProperties::(.*)" custom-vtbl="true" />
+		<map param="InterfaceWithProperties::GetValue2(.*)::(.*)" attribute="out" />
+		<map param="InterfaceWithProperties::IsTrueOutProp::(.*)" attribute="out" />
+		<map method="InterfaceWithProperties::(.+)Persistent" persist="true" />
 
-    <!-- Shadow auto-gen mappings -->
-    <map interface="CallbackInterface" callback="true" callback-dual="true" />
-    <map param="CallbackInterface::GetZero::ppValue" attribute="out" />
-    <map param="CallbackInterface::Increment::pValue" attribute="inout" />
-    <map method="CallbackInterface::.*" property="false" />
-    <map param="CallbackInterface::MappedTypeTest::i" type="unsigned int" />
-    <map param="CallbackInterface::ModifyPointer::out" attribute="out" return="true" />
-    <map param="CallbackInterface::ArrayRelation(.*)::array" attribute="in buffer" />
-    <map param="CallbackInterface::ArrayRelation(.*)::length" relation="length(array)" />
-  
-    <!-- Issue #67 -->
-    <map interface="FastOutInterface" callback="true" callback-dual="true" />
-    <map param="FastOutInterfaceTest::out" attribute="fast out" />
+		<!-- Shadow auto-gen mappings -->
+		<map interface="CallbackInterface" callback="true" callback-dual="true" />
+		<map param="CallbackInterface::GetZero::ppValue" attribute="out" />
+		<map param="CallbackInterface::Increment::pValue" attribute="inout" />
+		<map method="CallbackInterface::.*" property="false" />
+		<map param="CallbackInterface::MappedTypeTest::i" type="unsigned int" />
+		<map param="CallbackInterface::ModifyPointer::out" attribute="out" return="true" />
+		<map param="CallbackInterface::ArrayRelation(.*)::array" attribute="in buffer" />
+		<map param="CallbackInterface::ArrayRelation(.*)::length" relation="length(array)" />
 
-    <map interface="IStream" callback-visibility="public" callback="true" callback-dual="true" callback-name="ComStream" />
-    <map param="IStream::QueryInterface::ppvObject" attribute="out" />
-    <map param="IStream::Seek::dwOrigin" type="SHARPGEN_RUNTIME_SEEKORIGIN"/>
-    <map param="IStream::Seek::plibNewPosition" return="true" attribute="out optional"/>
-    <map param="IStream::CopyTo::pcbRead" attribute="out" return="true"/>
-    <map param="IStream::CopyTo::pcbWritten" attribute="out"/>
-    <map method="IStream::Stat" name="GetStatistics" />
-    <map param="IStream::Stat::pstatstg" attribute="out" return="true"/>
-    <map param="IStream::Clone::ppstm" attribute="out" return="true"/>
-    <map param="IStream::Read::pv" attribute="out buffer"/>
-    <map param="IStream::Read::pcbRead" attribute="out optional" return="true"/>
-    <map param="IStream::Write::pv" attribute="in buffer"/>
-    <map param="IStream::Write::pcbWritten" attribute="out optional" return="true"/>
-    <map method="IStream::.*" keep-implement-public="true"/>
-  </mapping>
+		<!-- Issue #67 -->
+		<map interface="FastOutInterface" callback="true" callback-dual="true" />
+		<map param="FastOutInterfaceTest::out" attribute="fast out" />
 
-  <depends>SharpGen.Runtime</depends>
+		<map interface="IStream" callback-visibility="public" callback="true" callback-dual="true" callback-name="ComStream" />
+		<map param="IStream::QueryInterface::ppvObject" attribute="out" />
+		<map param="IStream::Seek::dwOrigin" type="SHARPGEN_RUNTIME_SEEKORIGIN"/>
+		<map param="IStream::Seek::plibNewPosition" return="true" attribute="out optional"/>
+		<map param="IStream::CopyTo::pcbRead" attribute="out" return="true"/>
+		<map param="IStream::CopyTo::pcbWritten" attribute="out"/>
+		<map method="IStream::Stat" name="GetStatistics" />
+		<map param="IStream::Stat::pstatstg" attribute="out" return="true"/>
+		<map param="IStream::Clone::ppstm" attribute="out" return="true"/>
+		<map param="IStream::Read::pv" attribute="out buffer"/>
+		<map param="IStream::Read::pcbRead" attribute="out optional" return="true"/>
+		<map param="IStream::Write::pv" attribute="in buffer"/>
+		<map param="IStream::Write::pcbWritten" attribute="out optional" return="true"/>
+		<map method="IStream::.*" keep-implement-public="true"/>
+	</mapping>
+
+	<depends>SharpGen.Runtime</depends>
 </config>
