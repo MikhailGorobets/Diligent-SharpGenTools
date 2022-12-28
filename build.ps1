@@ -1,8 +1,15 @@
 Param(
     [string] $Configuration = "Debug",
     [switch] $SkipUnitTests = $false,
-    [switch] $SkipOuterloopTests = $false
+    [switch] $SkipOuterloopTests = $false,
+    [switch] $NugetPublish = $false
 )
+
+$PackageVersion = git describe --tags --abbrev=0
+
+if (!$NugetPublish) {
+    $PackageVersion = $PackageVersion + "-local"
+} 
 
 $env:MSBuildEnableWorkloadResolver=$false
 
@@ -36,7 +43,7 @@ if (!$SkipUnitTests) {
     }
 }
 
-if (!$SkipOuterloopTests -and !($env:ReleaseTag -and ($Configuration -eq "Release"))) {
+if (!$SkipOuterloopTests -and !($Configuration -eq "Release")) {
     Write-Debug "Deploying test packages"
     if (!(./build/deploy-test-packages -PackedConfiguration $Configuration -Project "SdkTests")) {
         Write-Error "Failed to deploy test packages"
