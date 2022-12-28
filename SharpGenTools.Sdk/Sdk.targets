@@ -12,7 +12,7 @@
 			   Condition="'$(MSBuildProjectExtension)' != '.csproj'" />
     </Target>
 
-    <Target Name="InstallCastXml" Condition="'$(CastXmlPath)' == ''">
+    <Target Name="SharpGenInstallCastXml" Condition="'$(CastXmlPath)' == ''">
         <PropertyGroup Condition="'$(InstallCastXMLCommand)' == ''">
             <InstallCastXmlCommand>
                 <![CDATA[pip install castxml]]>
@@ -25,11 +25,9 @@
         </PropertyGroup>
 
         <Exec Command="$(InstallCastXmlCommand)" />
-        <Exec Command="$(GetCastXmlPathCommand)" ConsoleToMSBuild="True" >
+        <Exec Command="$(GetCastXmlPathCommand)" ConsoleToMSBuild="True" StandardOutputImportance="Low">
             <Output TaskParameter="ConsoleOutput" PropertyName="CastXmlPath"/>
         </Exec>
-
-        <Message Importance="High" Text="$(CastXmlPath)"/>
     </Target>
 
     <Choose>
@@ -176,7 +174,7 @@
     Since @(SharpGenInputsCache) is written before @(GeneratedCSharpFiles), it will ensure the next time project is built,
     it will pass target up-to-date checks.
     -->
-    <Target Name="SharpGenExecute" DependsOnTargets="InstallCastXml">
+    <Target Name="SharpGenExecute">
         <ItemGroup Condition="'@(SharpGenPlatforms)' == '' and '$(RuntimeIdentifier)' != ''">
             <SharpGenPlatforms Include="Windows" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
             <SharpGenPlatforms Include="ItaniumSystemV" Condition="!$(RuntimeIdentifier.StartsWith('win'))" />
