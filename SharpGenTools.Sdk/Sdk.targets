@@ -252,11 +252,11 @@
 			Condition="'$(SharpGenIncludeRuntimePackageReference)' != 'false'">
         <ItemGroup>
             <_ExistingSharpGenRuntimePackageReference Include="@(PackageReference)"
-													  Condition="'%(PackageReference.Identity)' == 'SharpGen.Runtime'" />
+													  Condition="'%(PackageReference.Identity)' == 'Diligent-SharpGen.Runtime'" />
         </ItemGroup>
 
         <ItemGroup Condition="'$(SharpGenSdkUsedAsPackageReference)' != 'true'">
-            <PackageReference Include="SharpGen.Runtime"
+            <PackageReference Include="Diligent-SharpGen.Runtime"
 							  Version="$(SharpGenSdkVersion)"
 							  IsImplicitlyDefined="true"
 							  Condition="'@(_ExistingSharpGenRuntimePackageReference)' == ''" />

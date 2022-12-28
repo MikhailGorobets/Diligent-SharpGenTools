@@ -46,7 +46,7 @@ $BuildParameters = @(
     "--logger", "trx;LogFileName=$RepoRoot/artifacts/test-results/outerloop-test-$Hint.trx"
 ) + $Parameters + @($SdkTestsSolution) + $RunSettings
 
-$SdkAssemblyFolder = "$RepoRoot/SdkTests/RestoredPackages/sharpgentools.sdk/$Version/tools/"
+$SdkAssemblyFolder = "$RepoRoot/SdkTests/RestoredPackages/diligent-sharpgentools.sdk/$Version/tools/"
 
 $dotnetExe = $(Get-Command dotnet).Path
 $dotnetArgs = $($BuildParameters -join ' ')
