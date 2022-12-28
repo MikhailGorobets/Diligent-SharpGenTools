@@ -1,32 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config id="Struct" xmlns="urn:SharpGen.Config">
-  <namespace>Struct</namespace>
-  <assembly>Struct</assembly>
+	<namespace>Struct</namespace>
+	<assembly>Struct</assembly>
 
-  <sdk name="StdLib" />
-  
-  <include-dir>$(THIS_CONFIG_PATH)\..\Native\Struct</include-dir>
-  <include file="StructNative.h" attach="true" />
+	<sdk name="StdLib" />
 
-  <extension>
-    <create class="Struct.Functions" visibility="public static" />
-  </extension>
+	<include-dir>$(THIS_CONFIG_PATH)\..\Native\Struct</include-dir>
+	<include file="StructNative.h" attach="true" />
 
-  <bindings>
-  </bindings>
+	<extension>
+		<create class="Struct.Functions" visibility="public static" />
+	</extension>
 
-  <mapping>
-    <map function=".*" dll='"StructNative.dll"' group="Struct.Functions" />
-    <map function="PassThrough(.*)" name="PassThrough" />
-    <map struct="BitField2" native="true" />
-    <map struct="BoolToInt2" native="true" />
-    <map field="BoolToInt(.*)::test" type="bool" />
-    <map struct="CustomNativeNew" native="true" new="true" />
-    <map struct="CustomNativeNewNested" marshalto="true" />
-    <map struct="(.*)Relation" marshalto="true" />
-    <map field="StructSizeRelation::cbSize" relation="struct-size()" />
-    <map field="ReservedRelation::reserved" relation="const(42)" />
-  </mapping>
+	<bindings>
+	</bindings>
 
-  <depends>SharpGen.Runtime</depends>
+	<mapping>
+		<map function=".*" dll='"StructNative.dll"' group="Struct.Functions" />
+		<map function="PassThrough(.*)" name="PassThrough" />
+		<map struct="BitField2" native="true" />
+		<map struct="BoolToInt2" native="true" />
+		<map field="BoolToInt(.*)::test" type="bool" />
+		<map struct="CustomNativeNew" native="true" new="true" />
+		<map struct="CustomNativeNewNested" marshalto="true" />
+		<map struct="(.*)Relation" marshalto="true" />
+		<map field="StructSizeRelation::cbSize" relation="struct-size()" />
+		<map field="ReservedRelation::reserved" relation="const(42)" />
+	</mapping>
+
+	<depends>SharpGen.Runtime</depends>
 </config>
