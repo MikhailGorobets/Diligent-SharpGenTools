@@ -9,12 +9,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
-        <PackageReference Include="System.Runtime.Extensions" />
-        <PackageReference Include="System.ValueTuple" />
-        <PackageReference Include="System.Xml.XmlSerializer" />
-        <PackageReference Include="System.Xml.XmlDocument" />
-        <PackageReference Include="System.Runtime.Serialization.Primitives" />
-        <PackageReference Include="System.Runtime.Serialization.Xml" />
     </ItemGroup>
 
     <ItemGroup>
