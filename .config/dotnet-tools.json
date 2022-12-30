@@ -1,18 +1,24 @@
 {
-  "version": 1,
-  "isRoot": true,
-  "tools": {
-    "dotnet-reportgenerator-globaltool": {
-      "version": "5.1.4",
-      "commands": [
-        "reportgenerator"
-      ]
-    },
-    "coverlet.console": {
-      "version": "3.1.2",
-      "commands": [
-        "coverlet"
-      ]
+    "version": 1,
+    "isRoot": true,
+    "tools": {
+        "dotnet-reportgenerator-globaltool": {
+            "version": "5.1.13",
+            "commands": [
+                "reportgenerator"
+            ]
+        },
+        "coverlet.console": {
+            "version": "3.2.0",
+            "commands": [
+                "coverlet"
+            ]
+        },
+        "dotnetCampus.TagToVersion": {
+            "version": "1.0.11",
+            "commands": [
+                "dotnet-TagToVersion"
+            ]
+        }
     }
-  }
 }
