@@ -30,7 +30,7 @@
                 <![CDATA[pip install castxml]]>
             </InstallCastXmlCommand>
         </PropertyGroup>
-        <Exec Command="$(InstallCastXmlCommand)"/>
+        <Exec Command="$(InstallCastXmlCommand)" StandardOutputImportance="Low" />
     </Target>
 
 </Project>

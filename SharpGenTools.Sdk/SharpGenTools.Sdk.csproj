@@ -61,7 +61,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="../CastXML/**/*" PackagePath="tools/CastXML/%(RecursiveDir)%(FileName)%(Extension)" />
         <Content Include="SharpGenMapping.xaml" PackagePath="build" />
         <Content Include="Sdk.props" PackagePath="Sdk" />
         <Content Include="Sdk.targets" PackagePath="Sdk" />

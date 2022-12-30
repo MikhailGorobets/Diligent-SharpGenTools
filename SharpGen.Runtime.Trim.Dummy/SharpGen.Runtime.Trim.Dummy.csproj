@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <TrimmerRootAssembly Include="Diligent-SharpGen.Runtime" />
+        <TrimmerRootAssembly Include="SharpGen.Runtime" />
     </ItemGroup>
 
 </Project>
