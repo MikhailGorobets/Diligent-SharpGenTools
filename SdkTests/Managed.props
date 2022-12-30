@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
         <Platforms>x86;x64</Platforms>
+        <TargetFramework>net6.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <RestoreNoCache>true</RestoreNoCache>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -10,19 +11,6 @@
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' and '$(VisualStudioVersion)' != ''">
-        <TargetFramework>net6.0</TargetFramework>
-        <TargetPlatform>x86</TargetPlatform>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true'">
-        <TargetFrameworks>net6.0</TargetFrameworks>
-    </PropertyGroup>
-
-    <ItemGroup Condition="'$(SharpGenSdkTestsMultiTfmDependencies)' == 'true' and '$(MSBuildProjectName)' != 'Struct'">
-        <ProjectReference Include="..\Struct\Struct.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Diligent-SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
@@ -55,13 +43,6 @@
         <PropertyGroup>
             <SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
         </PropertyGroup>
-    </Target>
-
-    <Target Name="SharpGenSdkTestsVerifyTFM" BeforeTargets="BeforeCompile;CoreCompile">
-        <Error Text="TFM not set properly"
-               Condition="'$(TargetFramework)' != 'net6.0'"/>
-        <Error Text="TP not set properly"
-               Condition="'$(TargetPlatform)' != 'x86' and '$(TargetPlatform)' != 'x64'"/>
     </Target>
 
     <Target Name="_ResolveCopyLocalNuGetPackagePdbsAndXml" AfterTargets="ResolveReferences">

@@ -18,7 +18,6 @@
         <PackageReference Include="Microsoft.Bcl.HashCode" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
-        <PackageReference Include="Nullable" />
     </ItemGroup>
 
     <ItemGroup>

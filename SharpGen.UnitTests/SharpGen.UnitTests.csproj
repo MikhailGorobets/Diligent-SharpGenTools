@@ -21,7 +21,6 @@
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />
         <PackageReference Include="Xunit.SkippableFact" />
-        <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 
     <Target Name="InstallCastXml" Condition="'$(InstallCastXMLCommand)' == ''">
