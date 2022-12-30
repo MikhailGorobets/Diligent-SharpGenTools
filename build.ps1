@@ -13,8 +13,6 @@ if (!$NugetPublish) {
     $PackageVersion = $PackageVersion + "-local"
 } 
 
-dotnet tool install -g dotnetCampus.TagToVersion
-
 dotnet TagToVersion -t $PackageVersion
 
 dotnet pack -c $Configuration
