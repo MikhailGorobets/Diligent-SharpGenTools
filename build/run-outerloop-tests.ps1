@@ -31,15 +31,11 @@ if ($LastExitCode -ne 0) {
 
 $RunSettings = "--", "RunConfiguration.TargetPlatform=$Platform"
 
-if ($TargetFramework -eq "net472") {
-    $RunSettings += "RunConfiguration.DisableAppDomain=true"
-} else {
-    $Parameters += @(
-        "/p:CollectCoverage=true", "/p:CoverletOutputFormat=opencover", "/p:IncludeTestAssembly=true",
-        "/p:Include='[SharpGen]*%2c[SharpGen.Runtime]*%2c[SharpGen.Platform]*%2c[SharpGenTools.Sdk]*'",
-        "/p:CoverletOutput=$RepoRoot/artifacts/coverage/outerloop-test-$Hint.xml"
-    )
-}
+$Parameters += @(
+    "/p:CollectCoverage=true", "/p:CoverletOutputFormat=opencover", "/p:IncludeTestAssembly=true",
+    "/p:Include='[SharpGen]*%2c[SharpGen.Runtime]*%2c[SharpGen.Platform]*%2c[SharpGenTools.Sdk]*'",
+    "/p:CoverletOutput=$RepoRoot/artifacts/coverage/outerloop-test-$Hint.xml"
+)
 
 $BuildParameters = @(
     "test", "--no-restore", "-c:Debug", "-bl:$RepoRoot/artifacts/binlog/outerloop-test-$Hint.binlog", "--framework", $TargetFramework,
