@@ -12,6 +12,10 @@
         <CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(BuildingByReSharper)' == 'true'">
+        <TargetPlatform>x64</TargetPlatform>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Diligent-SharpGen.Runtime" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true"/>
         <PackageReference Include="Diligent-SharpGenTools.Sdk" Version="$(LocalPackageVersion)" IsImplicitlyDefined="true" PrivateAssets="All"/>
@@ -26,6 +30,10 @@
 
         <Compile Include="$(MSBuildThisFileDirectory)RuntimeConfigurationInitializer.cs"/>
     </ItemGroup>
+
+    <Target Name="SharpGenSdkTestsVerifyPlatform" BeforeTargets="BeforeCompile;CoreCompile">
+        <Error Text="TargetPlatform isn't set"  Condition="'$(TargetPlatform)' != 'x86' and '$(TargetPlatform)' != 'x64'"/>
+    </Target>
 
     <Target Name="SharpGenSetRoslynGeneratedPath">
         <PropertyGroup>
