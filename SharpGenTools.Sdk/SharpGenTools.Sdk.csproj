@@ -1,7 +1,6 @@
 ﻿<Project>
 
     <Import Project="Sdk.props" Sdk="MSBuild.Sdk.Extras" />
-    <Import Project="Sdk.props" Sdk="Microsoft.Build.CentralPackageVersions" />
 
     <PropertyGroup>
         <TargetFrameworks>net6.0</TargetFrameworks>
@@ -85,7 +84,6 @@
         <WriteLinesToFile File="$(SdkVersionPropsPath)" WriteOnlyWhenDifferent="true" Overwrite="true" Lines="@(_VersionPropsLine)" />
     </Target>
 
-    <Import Project="Sdk.targets" Sdk="Microsoft.Build.CentralPackageVersions" />
     <Import Project="Sdk.targets" Sdk="MSBuild.Sdk.Extras" />
 
     <!-- https://github.com/NuGet/NuGet.Client/blob/873f7db91460d8b35d971bf46660ffce0f629fd6/src/NuGet.Core/NuGet.Build.Tasks.Pack/NuGet.Build.Tasks.Pack.targets#L424-L431 -->

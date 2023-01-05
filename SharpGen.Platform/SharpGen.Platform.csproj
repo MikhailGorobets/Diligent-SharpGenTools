@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <Sdk Name="Microsoft.Build.CentralPackageVersions" />
-
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFrameworks>net6.0</TargetFrameworks>
