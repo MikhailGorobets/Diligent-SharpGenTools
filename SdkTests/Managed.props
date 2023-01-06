@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
         <Platforms>x86;x64</Platforms>
-        <TargetFramework>net6.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <RestoreNoCache>true</RestoreNoCache>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -14,6 +13,7 @@
 
     <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(BuildingByReSharper)' == 'true'">
         <TargetPlatform>x64</TargetPlatform>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
