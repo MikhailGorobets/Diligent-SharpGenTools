@@ -20,6 +20,10 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
+    - name: Restore .NET tools
+      working-directory: ${{github.workspace}}
+      run: dotnet tool restore
+
     - name: Build and test
       working-directory: ${{github.workspace}}
       run: ./build.ps1 -Configuration Release -NugetPublish true
