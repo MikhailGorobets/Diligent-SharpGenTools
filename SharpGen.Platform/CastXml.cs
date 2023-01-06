@@ -101,4 +101,9 @@ public static class CastXml
     ///     CastXml tag for ElaboratedType
     /// </summary>
     public const string TagElaboratedType = "ElaboratedType";
+
+    /// <summary>
+    ///     CastXml tag for Comment
+    /// </summary>
+    public const string TagComment = "Comment";
 }

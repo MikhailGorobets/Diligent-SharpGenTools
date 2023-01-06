@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -922,8 +923,12 @@ public sealed class CppParser
     {
         foreach (var xElement in _mapFileToXElement[includeCastXmlId])
         {
+            if (xElement.Name.LocalName == CastXml.TagComment)
+                continue;
+
             // If the element is not defined from a root namespace
             // than skip it, as it might be an inner type
+            Debug.Assert(!string.IsNullOrEmpty(xElement.AttributeValue("context")));
             if (_mapIdToXElement[xElement.AttributeValue("context")].Name.LocalName != CastXml.TagNamespace)
                 continue;
 
@@ -1090,6 +1095,9 @@ public sealed class CppParser
                 case CastXml.TagStruct:
                 case CastXml.TagUnion:
                     return name;
+                case CastXml.TagElaboratedType:
+                    xType = _mapIdToXElement[nextType];
+                    break;
                 case CastXml.TagTypedef:
                     if (_boundTypes.Contains(name))
                     {

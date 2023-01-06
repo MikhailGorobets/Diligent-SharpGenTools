@@ -87,9 +87,7 @@ public sealed partial class SharpGenTask
         }
         else
         {
-            bool Predicate(string x) => string.Equals(x, item);
-
-            var index = itemList.FindIndex(Predicate);
+            var index = itemList.FindIndex((x) => string.Equals(x, item));
             Debug.Assert(index != -1);
             Debug.Assert(metadataList[index] == metadata);
         }
