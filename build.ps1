@@ -13,7 +13,7 @@ if (!$NugetPublish) {
     $PackageVersion = $PackageVersion + "-local"
 } 
 
-dotnet TagToVersion -t $PackageVersion
+dotnet dotnet-TagToVersion -t $PackageVersion
 
 dotnet pack -c $Configuration
 
