@@ -119,8 +119,6 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
         // Current offset of a field
         uint currentFieldAbsoluteOffset = 0;
 
-        // Last field offset
-        int previousFieldOffsetIndex = -1;
 
         // Size of the last field
         uint previousFieldSize = 0;
@@ -144,8 +142,9 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
             currentStruct = inheritedStructs.Pop();
 
             var fields = currentStruct.Fields.ToArray();
-            int fieldCount = fields.Length;
+            var fieldCount = fields.Length;
             var fieldNames = NamingRules.Rename(fields);
+            var previousFieldOffsetIndex = -1;
 
             // -------------------------------------------------------------------------------
             // Iterate on all fields and perform mapping

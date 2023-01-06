@@ -13,6 +13,16 @@ struct StructWithArray
 	double j;
 };
 
+struct StructWithString 
+{
+	const char* name;
+};
+
+struct StructInheritanceString: StructWithString 
+{
+	int integer;
+};
+
 union TestUnion
 {
 	int integer;
