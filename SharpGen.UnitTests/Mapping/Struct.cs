@@ -131,9 +131,9 @@ public class Struct : MappingTestBase
             {
                 new IncludeRule
                 {
-                    File = "struct.h",
+                    File = "test.h",
                     Attach = true,
-                    Namespace = nameof(SequentialOffsets)
+                    Namespace = nameof(InheritingStructs)
                 }
             },
             Bindings =
@@ -142,42 +142,58 @@ public class Struct : MappingTestBase
             }
         };
 
-        var baseStruct = new CppStruct("base");
+        var struct0 = new CppStruct("struct0");
 
-        baseStruct.Add(new CppField("field")
+        struct0.Add(new CppField("field0")
+        {
+            TypeName = "char",
+            Pointer = "*"
+        });
+
+        var struct1 = new CppStruct("struct1")
+        {
+            Base = "struct0"
+        };
+
+        struct1.Add(new CppField("field1")
         {
             TypeName = "int"
         });
 
-        var inheritingStruct = new CppStruct("inheriting")
+        
+        var struct2 = new CppStruct("struct2")
         {
-            Base = "base"
+            Base = "struct1"
         };
 
-        inheritingStruct.Add(new CppField("field2")
+        struct2.Add(new CppField("field2")
         {
-            TypeName = "int",
-            Offset = 1
+            TypeName = "int"
         });
 
-        var cppInclude = new CppInclude("struct");
+        var cppInclude = new CppInclude("test");
+        cppInclude.Add(struct0);
+        cppInclude.Add(struct1);
+        cppInclude.Add(struct2);
 
         var cppModule = new CppModule("SharpGenTestModule");
-
         cppModule.Add(cppInclude);
-        cppInclude.Add(baseStruct);
-        cppInclude.Add(inheritingStruct);
 
         var (solution, _) = MapModel(cppModule, config);
 
-        var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == "Inheriting");
+        var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == "Struct2");
 
-        var field = csStruct.Fields.First(fld => fld.Name == "Field");
+        var field0 = csStruct.Fields.First(fld => fld.Name == "Field0");
+        var field1 = csStruct.Fields.First(fld => fld.Name == "Field1");
         var field2 = csStruct.Fields.First(fld => fld.Name == "Field2");
 
-        Assert.Equal(0u, field.Offset);
+        Assert.NotNull(field0);
+        Assert.NotNull(field1);
+        Assert.NotNull(field2);
 
-        Assert.Equal(4u, field2.Offset);
+        Assert.Equal(0u, field0.Offset);
+        Assert.Equal(8u, field1.Offset);
+        Assert.Equal(12u, field2.Offset);
     }
 
     [Fact]

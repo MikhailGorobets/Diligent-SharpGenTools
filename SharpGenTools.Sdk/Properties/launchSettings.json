@@ -5,8 +5,8 @@
     },
     "SdkTestsBuild": {
       "commandName": "Executable",
-      "executablePath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Preview\\MSBuild\\Current\\Bin\\MSBuild.exe",
-      "commandLineArgs": "C:\\Users\\jekoritz\\source\\repos\\SharpGenTools\\SdkTests\\SdkTests.sln",
+      "executablePath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Msbuild\\Current\\Bin\\MSBuild.exe",
+      "commandLineArgs": "C:\\Users\\Mikhail\\Desktop\\Diligent-SharpGenTools\\SdkTests\\SdkTests.sln /p:TargetFramework=net6.0 /p:TargetPlatform=x64",
       "nativeDebugging": false
     }
   }

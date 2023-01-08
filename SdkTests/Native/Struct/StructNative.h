@@ -13,14 +13,19 @@ struct StructWithArray
 	double j;
 };
 
-struct StructWithString 
+struct StructWithPointer 
 {
 	const char* name;
 };
 
-struct StructInheritanceString: StructWithString 
+struct StructInheritanceA: StructWithPointer
 {
-	int integer;
+	int integer0;
+};
+
+struct StructInheritanceB : StructInheritanceA
+{
+	int integer1;
 };
 
 union TestUnion
