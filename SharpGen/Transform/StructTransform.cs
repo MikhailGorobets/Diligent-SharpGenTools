@@ -118,8 +118,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
 
         // Current offset of a field
         uint currentFieldAbsoluteOffset = 0;
-
-
+        
         // Size of the last field
         uint previousFieldSize = 0;
 

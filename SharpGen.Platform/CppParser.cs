@@ -743,7 +743,7 @@ public sealed class CppParser
             CppStruct cppStructBase = null;
             Logger.RunInContext("Base", () => { cppStructBase = ParseStructOrUnion(xElementBase); });
 
-            if (string.IsNullOrEmpty(cppStructBase.Base))
+            if (!string.IsNullOrEmpty(cppStructBase.Name))
                 baseName = cppStructBase.Name;
         }
 
