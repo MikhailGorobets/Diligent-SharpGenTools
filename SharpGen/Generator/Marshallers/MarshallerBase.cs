@@ -363,7 +363,7 @@ internal abstract partial class MarshallerBase
             > 1 => NotSupported(
                 "Cannot marshal a native array [{0}] to a managed array when length is specified multiple times"
             ),
-            _ => LengthRelationMarshaller.GenerateNativeToManaged(csElement, lengthParam[0])
+            _ => new LengthRelationMarshaller(ioc).GenerateNativeToManaged(csElement, lengthParam[0])
         };
 
         StatementSyntax NotSupported(string hint)

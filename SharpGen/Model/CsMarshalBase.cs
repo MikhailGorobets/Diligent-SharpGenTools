@@ -61,7 +61,7 @@ public abstract class CsMarshalBase : CsBase
 
     public virtual bool HasPointer { get; }
 
-    public ArraySpecification? ArraySpecification { get; private set; }
+    public ArraySpecification? ArraySpecification { get; set; }
     public bool IsWideChar { get; set; }
 
     public virtual bool IsArray
@@ -84,7 +84,6 @@ public abstract class CsMarshalBase : CsBase
     }
 
     public int ArrayDimensionValue => ArraySpecification is {Dimension: { } value} ? checked((int) value) : 0;
-    public uint ArrayDimensionValueUnsigned => ArraySpecification is {Dimension: { } value} ? value : 0;
 
     public IReadOnlyList<MarshallableRelation> Relations
     {

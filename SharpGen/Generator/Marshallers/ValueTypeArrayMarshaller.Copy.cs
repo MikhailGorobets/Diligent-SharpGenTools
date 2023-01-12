@@ -61,7 +61,7 @@ internal sealed partial class ValueTypeArrayMarshaller
                     SyntaxKind.MultiplyExpression,
                     LiteralExpression(
                         SyntaxKind.NumericLiteralExpression,
-                        Literal(marshallable.ArrayDimensionValueUnsigned)
+                        Literal((uint)marshallable.ArrayDimensionValue)
                     ),
                     SizeOf(marshallable.MarshalType)
                 ),

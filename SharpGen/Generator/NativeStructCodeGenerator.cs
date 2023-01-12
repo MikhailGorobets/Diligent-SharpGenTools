@@ -26,7 +26,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
     public override IEnumerable<MemberDeclarationSyntax> GenerateCode(CsStruct csStruct)
     {
         yield return StructDeclaration("__Native")
-                    .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.PartialKeyword)))
+                    .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.PartialKeyword)))
                     .WithAttributeLists(SingletonList(GenerateStructLayoutAttribute(csStruct)))
                     .WithMembers(List(csStruct.Fields.SelectMany(GenerateMarshalStructField)));
 
@@ -77,8 +77,16 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             if (csStruct.ExplicitLayout)
                 fieldDecl = AddFieldOffsetAttribute(fieldDecl, field.Offset);
 
-            if (field.ArraySpecification is {} arraySpecification)
+            if (field.ArraySpecification is { } arraySpecification)
             {
+                if (arraySpecification.Type == ArraySpecificationType.Dynamic)
+                {
+                    yield return FieldDeclaration(VariableDeclaration(ParseTypeName($"{field.MarshalType.QualifiedName}*")))
+                                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                                .AddDeclarationVariables(VariableDeclarator(field.Name));
+                    yield break;
+                }
+
                 yield return fieldDecl.WithDeclaration(
                     fieldDecl.Declaration.AddVariables(VariableDeclarator(field.Name))
                 );
@@ -145,7 +153,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
     private MethodDeclarationSyntax GenerateMarshalFree(CsStruct csStruct) => GenerateMarshalMethod(
         "__MarshalFree",
-        csStruct.Fields.Where(field => !field.IsArray),
+        csStruct.Fields.Where(field => !(field.ArraySpecification?.Type == ArraySpecificationType.Constant)),
         field => GetMarshaller(field)?.GenerateNativeCleanup(field, false)
     );
 
@@ -162,16 +170,8 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             foreach (var relation in field.Relations)
             {
                 var marshaller = GetRelationMarshaller(relation);
-                CsField publicElement = null;
-
-                if (relation is LengthRelation related)
-                {
-                    var relatedMarshallableName = related.Identifier;
-
-                    publicElement = csStruct.Fields.First(fld => fld.CppElementName == relatedMarshallableName);
-                }
-
-                yield return marshaller.GenerateManagedToNative(publicElement, field);
+                if (relation is not LengthRelation related)
+                    yield return marshaller.GenerateManagedToNative(null, field);            
             }
         }
 
@@ -210,11 +210,22 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
            .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword)))
            .WithBody(body.ToBlock());
 
-    private MethodDeclarationSyntax GenerateMarshalFrom(CsStruct csStruct) => GenerateMarshalMethod(
-        "__MarshalFrom",
-        csStruct.PublicFields,
-        field => GetMarshaller(field).GenerateNativeToManaged(field, false)
-    );
+    private MethodDeclarationSyntax GenerateMarshalFrom(CsStruct csStruct)
+    {
+        IEnumerable<StatementSyntax> FieldMarshallers(CsField field)
+        {
+            if (field.Relations.Count == 0)
+            {
+                yield return GetMarshaller(field).GenerateNativeToManaged(field, false);
+                yield break;
+            }
+        }
+
+        return GenerateMarshalMethod(
+            "__MarshalFrom",
+            csStruct.PublicFields,
+            FieldMarshallers);
+    }
 
     public NativeStructCodeGenerator(Ioc ioc) : base(ioc)
     {

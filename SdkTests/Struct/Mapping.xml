@@ -26,6 +26,7 @@
 		<map struct="(.*)Relation" marshalto="true" />
 		<map field="StructSizeRelation::cbSize" relation="struct-size()" />
 		<map field="ReservedRelation::reserved" relation="const(42)" />
+		<map field="StructWithArrayOfInterface::interfaceCount" relation="length(interfaces)" />
 	</mapping>
 
 	<depends>SharpGen.Runtime</depends>
