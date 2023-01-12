@@ -528,4 +528,133 @@ public class Struct : MappingTestBase
 
         Assert.False(Logger.HasErrors);
     }
+
+
+    [Fact]
+    public void LengthRelationInStruct()
+    {
+        var structName = "Test";
+        var config = new ConfigFile
+        {
+            Id = nameof(InvalidLengthRelationInStruct),
+            Namespace = nameof(InvalidLengthRelationInStruct),
+            Includes =
+            {
+                new IncludeRule
+                {
+                    File = "test.h",
+                    Attach = true,
+                    Namespace = nameof(InvalidLengthRelationInStruct)
+                }
+            },
+            Bindings =
+            {
+                new BindRule("int", "System.Int32")
+            },
+            Mappings =
+            {
+                new MappingRule
+                {
+                    Field = $"{structName}::count",
+                    Relation = "length(elements)"
+                },
+            }
+        };
+
+        var structure = new CppStruct(structName);
+
+        structure.Add(new CppField("elements")
+        {
+            TypeName = "int",
+            Pointer = "*"
+        });
+        structure.Add(new CppField("count")
+        {
+            TypeName = "int",
+            Offset = 1,
+        });
+
+
+        var include = new CppInclude("test");
+
+        include.Add(structure);
+
+        var module = new CppModule("SharpGenTestModule");
+        module.Add(include);
+
+
+        var (solution, _) = MapModel(module, config);
+
+        var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == structName);
+        Assert.NotNull(csStruct);
+
+        var field0 = csStruct.Fields.First(fld => fld.Name == "Elements");
+        var field1 = csStruct.Fields.First(fld => fld.Name == "Count");
+
+        Assert.NotNull(field0);
+        Assert.NotNull(field1);
+        Assert.Equal(ArraySpecificationType.Dynamic, field0.ArraySpecification?.Type);
+        Assert.Equal("Count", field0.ArraySpecification?.SizeIdentifier);
+    }
+
+
+    [Fact]
+    public void InvalidLengthRelationInStruct()
+    {
+        var structName = "Test";
+        var config = new ConfigFile
+        {
+            Id = nameof(InvalidLengthRelationInStruct),
+            Namespace = nameof(InvalidLengthRelationInStruct),
+            Includes =
+            {
+                new IncludeRule
+                {
+                    File = "test.h",
+                    Attach = true,
+                    Namespace = nameof(InvalidLengthRelationInStruct)
+                }
+            },
+            Bindings =
+            {
+                new BindRule("int", "System.Int32")
+            },
+            Mappings =
+            {
+                new MappingRule
+                {
+                    Field = $"{structName}::count",
+                    Relation = "length(check)"
+                },
+            }
+        };
+
+        var structure = new CppStruct(structName);
+
+        structure.Add(new CppField("elements")
+        {
+            TypeName = "int",
+            Pointer = "*"
+        });
+        structure.Add(new CppField("count")
+        {
+            TypeName = "int",
+            Offset = 1,
+        });
+
+
+        var include = new CppInclude("test");
+
+        include.Add(structure);
+
+        var module = new CppModule("SharpGenTestModule");
+        module.Add(include);
+
+
+        using (LoggerMessageCountEnvironment(1, LogLevel.Error))
+        using (LoggerCodeRequiredEnvironment(LoggingCodes.InvalidLengthRelation))
+        {
+            MapModel(module, config);
+        }
+    }
 }

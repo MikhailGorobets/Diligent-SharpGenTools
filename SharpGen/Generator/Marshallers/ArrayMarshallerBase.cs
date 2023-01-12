@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
@@ -8,6 +9,8 @@ namespace SharpGen.Generator.Marshallers;
 
 internal abstract class ArrayMarshallerBase : MarshallerBase, IMarshaller
 {
+    public static readonly SyntaxToken MarshalParameterRefName = Identifier("@ref");
+
     public ArgumentSyntax GenerateManagedArgument(CsParameter csElement) =>
         Argument(IdentifierName(csElement.Name));
 

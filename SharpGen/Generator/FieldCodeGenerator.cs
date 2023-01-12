@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection.Metadata;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
@@ -34,31 +35,43 @@ internal sealed partial class FieldCodeGenerator : MemberMultiCodeGeneratorBase<
         {
             var elementType = ParseTypeName(csElement.PublicType.QualifiedName);
 
-            yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true);
+            if (csElement.ArraySpecification?.Type == ArraySpecificationType.Constant)
+            {
+                yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true);
 
-            yield return GenerateProperty(
-                csElement, ArrayType(elementType, SingletonList(ArrayRankSpecifier())),
-                value => AssignmentExpression(
-                    SyntaxKind.CoalesceAssignmentExpression,
-                    value,
-                    ObjectCreationExpression(
-                        ArrayType(
-                            elementType,
-                            SingletonList(
-                                ArrayRankSpecifier(
-                                    SingletonSeparatedList<ExpressionSyntax>(
-                                        LiteralExpression(
-                                            SyntaxKind.NumericLiteralExpression,
-                                            Literal(csElement.ArrayDimensionValue)
+                yield return GenerateProperty(
+                    csElement, ArrayType(elementType, SingletonList(ArrayRankSpecifier())),
+                    value => AssignmentExpression(
+                        SyntaxKind.CoalesceAssignmentExpression,
+                        value,
+                        ObjectCreationExpression(
+                            ArrayType(
+                                elementType,
+                                SingletonList(
+                                    ArrayRankSpecifier(
+                                        SingletonSeparatedList<ExpressionSyntax>(
+                                            LiteralExpression(
+                                                SyntaxKind.NumericLiteralExpression,
+                                                Literal(csElement.ArrayDimensionValue)
+                                            )
                                         )
                                     )
                                 )
                             )
                         )
-                    )
-                ),
-                null
-            );
+                    ),
+                    null
+                );
+            }
+            else if (csElement.ArraySpecification?.Type == ArraySpecificationType.Dynamic) 
+            {
+                yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true, propertyBacking: false, document: true);
+            }
+            else
+            {
+                throw new System.InvalidOperationException();
+            }
+
         }
         else if (csElement.IsBitField)
         {

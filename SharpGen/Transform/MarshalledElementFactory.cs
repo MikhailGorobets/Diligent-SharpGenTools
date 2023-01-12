@@ -34,7 +34,7 @@ public sealed class MarshalledElementFactory
         var publicTypeName = mappingRule is {MappingType: { } mapType} ? mapType : marshallable.TypeName;
 
         // If CppType is an array, try first to get the binding for this array
-        if (csMarshallable.IsArray)
+        if (marshallable.IsArray)
         {
             publicType = TypeRegistry.FindBoundType(publicTypeName + "[" + marshallable.ArrayDimension + "]");
 

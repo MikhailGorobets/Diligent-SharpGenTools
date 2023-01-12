@@ -28,8 +28,8 @@ internal sealed class LengthRelationMarshaller : MarshallerBase, IRelationMarsha
         );
     }
 
-    public static StatementSyntax GenerateNativeToManaged(CsMarshalBase publicElement,
-                                                          CsMarshalBase relatedElement) => ExpressionStatement(
+    public StatementSyntax GenerateNativeToManaged(CsMarshalBase publicElement,
+                                                   CsMarshalBase relatedElement) => ExpressionStatement(
         AssignmentExpression(
             SyntaxKind.SimpleAssignmentExpression,
             IdentifierName(publicElement.Name),

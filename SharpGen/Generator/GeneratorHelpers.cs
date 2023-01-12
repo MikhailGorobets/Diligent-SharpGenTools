@@ -12,7 +12,7 @@ namespace SharpGen.Generator;
 
 public static class GeneratorHelpers
 {
-    private static readonly PlatformDetectionType[] Platforms = (PlatformDetectionType[])Enum.GetValues(typeof(PlatformDetectionType));
+    private static readonly PlatformDetectionType[] Platforms = (PlatformDetectionType[]) Enum.GetValues(typeof(PlatformDetectionType));
     private static readonly PlatformDetectionType[] PlatformsNoAny = Platforms.Where(x => x != PlatformDetectionType.Any).ToArray();
     private static readonly int PlatformsNoAnyStringLength = PlatformsNoAny.Select(x => x.ToString().Length).Max() + 2;
 
@@ -56,6 +56,11 @@ public static class GeneratorHelpers
         IdentifierName("Length")
     );
 
+    public static ExpressionSyntax NullableLengthExpression(ExpressionSyntax expression) => ConditionalAccessExpression(
+        WrapInParentheses(expression),
+        MemberBindingExpression(Token(SyntaxKind.DotToken), IdentifierName("Length"))
+    );
+
     public static ExpressionSyntax OptionalLengthExpression(ExpressionSyntax expression) => BinaryExpression(
         SyntaxKind.CoalesceExpression,
         ConditionalAccessExpression(
@@ -69,7 +74,7 @@ public static class GeneratorHelpers
     {
         var wrappedExpression = WrapInParentheses(expression);
 
-        return expression is CastExpressionSyntax {Type: { } castType} && castType.IsEquivalentTo(type)
+        return expression is CastExpressionSyntax { Type: { } castType } && castType.IsEquivalentTo(type)
                    ? wrappedExpression
                    : SyntaxFactory.CastExpression(type, wrappedExpression);
     }

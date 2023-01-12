@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
@@ -22,6 +23,8 @@ internal sealed class ConstantValueRelationMarshaller : MarshallerBase, IRelatio
             )
         );
     }
+
+    public StatementSyntax GenerateNativeToManaged(CsMarshalBase publicElement, CsMarshalBase relatedElement) => throw new NotImplementedException();
 
     public ConstantValueRelationMarshaller(Ioc ioc) : base(ioc)
     {

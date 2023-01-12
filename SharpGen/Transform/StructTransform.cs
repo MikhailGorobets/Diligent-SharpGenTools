@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SharpGen.CppModel;
@@ -244,6 +245,31 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
                 break;
             }
         }
+
+        foreach (var field in csStruct.Fields)
+        {
+            var relations = field.Relations;
+            foreach (var relation in relations)
+            {
+                CsField relatedField = null;
+
+                if (relation is LengthRelation { Identifier: { Length: > 0 } relatedMarshallableName })
+                {
+                    relatedField = csStruct.Fields.SingleOrDefault(p => p.CppElementName == relatedMarshallableName);
+
+                    if (relatedField is null)
+                    {
+                        Logger.Error(LoggingCodes.InvalidLengthRelation, $"The relation with \"{relatedMarshallableName}\" field is invalid in a struct \"{csStruct.Name}\".");
+                        continue;
+                    }
+
+                    Debug.Assert(!relatedField.ArraySpecification.HasValue);
+                    relatedField.ArraySpecification = new ArraySpecification(field.Name, field.PublicType.Name);
+                }
+            }
+        }
+
+        //TODO Check count of pointers to arrays
 
         csStruct.StructSize = currentFieldAbsoluteOffset + previousFieldSize;
     }

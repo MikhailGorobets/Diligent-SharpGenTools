@@ -102,6 +102,13 @@ struct StructWithInterface
 	Interface* test;
 };
 
+struct StructWithArrayOfInterface
+{
+	Interface** interfaces;
+	int interfaceCount;
+};
+
+
 struct PointerSizeMember
 {
 	size_t pointerSize;
