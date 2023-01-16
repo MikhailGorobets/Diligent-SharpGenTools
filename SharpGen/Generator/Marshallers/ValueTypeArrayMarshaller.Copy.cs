@@ -39,6 +39,13 @@ internal sealed partial class ValueTypeArrayMarshaller
             direction, Identifier(ToIdentifier), Identifier(FromIdentifier)
         );
 
+        ExpressionSyntax argumentExpression = marshallable.ArraySpecification?.Type == ArraySpecificationType.Constant ?
+                    LiteralExpression(
+                        SyntaxKind.NumericLiteralExpression,
+                        Literal((uint) marshallable.ArrayDimensionValue)
+                    ) :
+                    GeneratorHelpers.CastExpression(TypeUInt32, GeneratorHelpers.LengthExpression(IdentifierName(marshallable.Name)));
+
         return FixedStatement(
             VariableDeclaration(
                 VoidPtrType,
@@ -59,10 +66,7 @@ internal sealed partial class ValueTypeArrayMarshaller
             GenerateCopyMemoryInvocation(
                 BinaryExpression(
                     SyntaxKind.MultiplyExpression,
-                    LiteralExpression(
-                        SyntaxKind.NumericLiteralExpression,
-                        Literal((uint)marshallable.ArrayDimensionValue)
-                    ),
+                    argumentExpression,
                     SizeOf(marshallable.MarshalType)
                 ),
                 castTo: false, castFrom: false

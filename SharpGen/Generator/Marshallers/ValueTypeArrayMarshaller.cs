@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -23,8 +24,18 @@ internal sealed partial class ValueTypeArrayMarshaller : MarshallerBase, IMarsha
 
         return csElement switch
         {
-            CsParameter {IsLocalManagedReference: true} parameter => GenerateCopyBlock(parameter, direction),
-            CsField field => GenerateCopyMemory(field, direction),
+            CsParameter { IsLocalManagedReference: true } parameter => GenerateCopyBlock(parameter, direction),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Constant } => GenerateCopyMemory(csElement, direction),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
+                 IfStatement(BinaryExpression(SyntaxKind.GreaterThanExpression, GeneratorHelpers.NullableLengthExpression(IdentifierName(csElement.Name)), ZeroLiteral),
+                     Block(
+                          ExpressionStatement(
+                            AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.Name)),
+                                ParseExpression($"({csElement.PublicType.QualifiedName}*)System.Runtime.InteropServices.NativeMemory.Alloc((nuint) (System.Runtime.CompilerServices.Unsafe.SizeOf<{csElement.PublicType.QualifiedName}>() * {csElement.Name}.Length))"))), 
+                         GenerateCopyMemory(csElement, ArrayCopyDirection.ManagedToNative)
+                     )
+                 ),
             _ => null
         };
     }
@@ -35,7 +46,13 @@ internal sealed partial class ValueTypeArrayMarshaller : MarshallerBase, IMarsha
     public ArgumentSyntax GenerateNativeArgument(CsMarshalCallableBase csElement) =>
         Argument(GetMarshalStorageLocation(csElement));
 
-    public StatementSyntax GenerateNativeCleanup(CsMarshalBase csElement, bool singleStackFrame) => null;
+    public StatementSyntax GenerateNativeCleanup(CsMarshalBase csElement, bool singleStackFrame) =>
+        csElement switch
+        {
+            CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
+                 Block(ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")),
+            _ => null
+        };
 
     public StatementSyntax GenerateNativeToManaged(CsMarshalBase csElement, bool singleStackFrame)
     {
@@ -43,8 +60,18 @@ internal sealed partial class ValueTypeArrayMarshaller : MarshallerBase, IMarsha
 
         return csElement switch
         {
-            CsParameter {PassedByManagedReference: true} parameter => GenerateCopyBlock(parameter, direction),
-            CsField field => GenerateCopyMemory(field, direction),
+            CsParameter { PassedByManagedReference: true } parameter => GenerateCopyBlock(parameter, direction),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Constant } => GenerateCopyMemory(csElement, direction),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
+                IfStatement(BinaryExpression(SyntaxKind.GreaterThanExpression, MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.ArraySpecification?.SizeIdentifier)), ZeroLiteral),
+                    Block(
+                        ExpressionStatement(
+                            AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                                IdentifierName(csElement.Name),
+                                ParseExpression($"new {csElement.PublicType.QualifiedName}[@ref.{csElement.ArraySpecification?.SizeIdentifier}]"))),
+                        GenerateCopyMemory(csElement, ArrayCopyDirection.NativeToManaged)
+                    )
+                ),
             _ => null
         };
     }

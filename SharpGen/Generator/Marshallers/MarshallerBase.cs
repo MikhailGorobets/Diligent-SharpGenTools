@@ -18,6 +18,7 @@ internal enum StructMarshalMethod
 
 internal abstract partial class MarshallerBase
 {
+    protected static readonly SyntaxToken MarshalParameterRefName = Identifier("@ref");
     protected static readonly SyntaxToken PtrIdentifier = Identifier("__ptr");
     protected static readonly IdentifierNameSyntax PtrIdentifierName = IdentifierName(PtrIdentifier);
     protected static readonly SyntaxToken LengthIdentifier = Identifier("__length");
@@ -92,15 +93,11 @@ internal abstract partial class MarshallerBase
                     SeparatedList(
                         new[]
                         {
-                            VariableDeclarator(indexVariable, default, EqualsValueClause(ZeroLiteral)),
-                            VariableDeclarator(
-                                LengthIdentifier, default,
-                                EqualsValueClause(GeneratorHelpers.LengthExpression(arrayIdentifier))
-                            )
+                            VariableDeclarator(indexVariable, default, EqualsValueClause(ZeroLiteral))
                         }
                     )),
                 default,
-                BinaryExpression(SyntaxKind.LessThanExpression, indexVariableName, LengthIdentifierName),
+                BinaryExpression(SyntaxKind.LessThanExpression, indexVariableName, GeneratorHelpers.NullableLengthExpression(arrayIdentifier)),
                 SingletonSeparatedList<ExpressionSyntax>(
                     PrefixUnaryExpression(SyntaxKind.PreIncrementExpression, indexVariableName)
                 ),

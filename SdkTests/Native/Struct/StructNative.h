@@ -102,10 +102,48 @@ struct StructWithInterface
 	Interface* test;
 };
 
-struct StructWithArrayOfInterface
+struct StructWithDynamicArrayOfInterface
 {
 	Interface** interfaces;
 	int interfaceCount;
+};
+
+struct StructWithDynamicArrayOfIntegralType
+{
+	int* elements;
+	int elementCount;
+};
+
+struct StructWithDynamicArrayOfPrimitiveStruct
+{
+	SimpleStruct* structs;
+	int structCount;
+};
+
+struct StructWithDynamicArrayOfMarshaledStruct
+{
+	StructInheritanceB* structs;
+	int structCount;
+};
+
+struct StructWithConstArrayOfInterface
+{
+	Interface* interfaces[8];
+};
+
+struct StructWithConstArrayOfIntegralType
+{
+	int elements[8];
+};
+
+struct StructWithConstArrayOfPrimitiveStruct
+{
+	SimpleStruct structs[8];
+};
+
+struct StructWithConstrrayOfMarshaledStruct
+{
+	StructInheritanceB structs[8];
 };
 
 

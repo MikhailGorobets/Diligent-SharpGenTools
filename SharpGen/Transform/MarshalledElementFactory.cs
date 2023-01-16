@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using SharpGen.Config;
+﻿using SharpGen.Config;
 using SharpGen.CppModel;
 using SharpGen.Logging;
 using SharpGen.Model;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace SharpGen.Transform;
 
@@ -157,7 +157,11 @@ public sealed class MarshalledElementFactory
 
         CreateCore(field);
 
-        MakeGeneralPointersBeIntPtr(field);
+        if (!field.HasPointer)
+            return field;
+
+        if (field.IsString || field.IsInterface)
+            field.MarshalType = TypeRegistry.IntPtr;
 
         return field;
     }

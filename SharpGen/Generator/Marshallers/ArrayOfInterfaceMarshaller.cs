@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -26,7 +25,26 @@ internal sealed class ArrayOfInterfaceMarshaller : ArrayMarshallerBase
                                 MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.ArraySpecification?.SizeIdentifier)),
                                 ParseExpression($"({csElement.ArraySpecification?.TypeSizeIdentifier}){csElement.Name}.Length")))
                 )),
-            _ => LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceToNative(csElement, publicElement, marshalElement)),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Constant } =>
+             FixedStatement(
+                    VariableDeclaration(
+                    ParseTypeName($"{csElement.MarshalType.QualifiedName}*"),
+                    SingletonSeparatedList(
+                        VariableDeclarator(PtrIdentifier)
+                           .WithInitializer(
+                                EqualsValueClause(
+                                    PrefixUnaryExpression(
+                                        SyntaxKind.AddressOfExpression,
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName),
+                                                IdentifierName(csElement.Name)
+                                        )
+                                    )
+                                )
+                            )
+                    )
+                ), LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceToNative(csElement, publicElement, ParseExpression($"({PtrIdentifier.Text})[i]")))),
+            _ => LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceToNative(csElement, publicElement, marshalElement))
         };
 
     public override StatementSyntax GenerateNativeCleanup(CsMarshalBase csElement, bool singleStackFrame) =>
@@ -35,9 +53,10 @@ internal sealed class ArrayOfInterfaceMarshaller : ArrayMarshallerBase
              CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
                 Block(
                     GenerateGCKeepAlive(csElement),
-                    ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")),
-              _ => GenerateGCKeepAlive(csElement)
-        };
+                    ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")
+                ),
+             _ => GenerateGCKeepAlive(csElement)
+         };
 
     public override StatementSyntax GenerateNativeToManaged(CsMarshalBase csElement, bool singleStackFrame) =>
         csElement switch
@@ -79,7 +98,25 @@ internal sealed class ArrayOfInterfaceMarshaller : ArrayMarshallerBase
                                 ParseExpression($"new {csElement.PublicType.QualifiedName}[@ref.{csElement.ArraySpecification?.SizeIdentifier}]"))),
                         LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceFromNative(csElement, publicElement, marshalElement))
                 )),
-            _ => LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceFromNative(csElement, publicElement, marshalElement)),
+            CsField { ArraySpecification.Type: ArraySpecificationType.Constant } => FixedStatement(
+                    VariableDeclaration(
+                    ParseTypeName($"{csElement.MarshalType.QualifiedName}*"),
+                    SingletonSeparatedList(
+                        VariableDeclarator(PtrIdentifier)
+                           .WithInitializer(
+                                EqualsValueClause(
+                                    PrefixUnaryExpression(
+                                        SyntaxKind.AddressOfExpression,
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName),
+                                                IdentifierName(csElement.Name)
+                                        )
+                                    )
+                                )
+                            )
+                    )
+                ), LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceFromNative(csElement, publicElement, ParseExpression($"({PtrIdentifier.Text})[i]")))),
+            _ => LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => MarshalInterfaceInstanceFromNative(csElement, publicElement, marshalElement))
         };
 
     protected override TypeSyntax GetMarshalElementTypeSyntax(CsMarshalBase csElement) => IntPtrType;
