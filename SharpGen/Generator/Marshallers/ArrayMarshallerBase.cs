@@ -9,8 +9,6 @@ namespace SharpGen.Generator.Marshallers;
 
 internal abstract class ArrayMarshallerBase : MarshallerBase, IMarshaller
 {
-    public static readonly SyntaxToken MarshalParameterRefName = Identifier("@ref");
-
     public ArgumentSyntax GenerateManagedArgument(CsParameter csElement) =>
         Argument(IdentifierName(csElement.Name));
 

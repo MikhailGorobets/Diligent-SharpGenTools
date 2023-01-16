@@ -101,7 +101,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
         csStruct.IsFullyMapped = true;
 
         // Get the associated CppStruct and CSharpTag
-        var cppStruct = (CppStruct)csStruct.CppElement;
+        var cppStruct = (CppStruct) csStruct.CppElement;
 
         // If this structure need to me moved to another container, move it now
         foreach (var keyValuePair in _mapMoveStructToInner)
@@ -109,7 +109,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
             if (keyValuePair.Key.Match(csStruct.CppElementName).Success)
             {
                 string cppName = keyValuePair.Key.Replace(csStruct.CppElementName, keyValuePair.Value);
-                var destSharpStruct = (CsStruct)TypeRegistry.FindBoundType(cppName);
+                var destSharpStruct = (CsStruct) TypeRegistry.FindBoundType(cppName);
                 // Remove the struct from his container
                 csStruct.Parent.Remove(csStruct);
                 // Add this struct to the new container struct
@@ -119,7 +119,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
 
         // Current offset of a field
         uint currentFieldAbsoluteOffset = 0;
-        
+
         // Size of the last field
         uint previousFieldSize = 0;
 
@@ -251,11 +251,9 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
             var relations = field.Relations;
             foreach (var relation in relations)
             {
-                CsField relatedField = null;
-
                 if (relation is LengthRelation { Identifier: { Length: > 0 } relatedMarshallableName })
                 {
-                    relatedField = csStruct.Fields.SingleOrDefault(p => p.CppElementName == relatedMarshallableName);
+                    var relatedField = csStruct.Fields.SingleOrDefault(p => p.CppElementName == relatedMarshallableName);
 
                     if (relatedField is null)
                     {

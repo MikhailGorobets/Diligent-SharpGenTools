@@ -126,6 +126,9 @@ internal sealed class StringMarshaller : MarshallerBase, IMarshaller
 
     public StatementSyntax GenerateNativeCleanup(CsMarshalBase csElement, bool singleStackFrame)
     {
+        if (csElement.IsArray)
+            return null;
+
         if (!csElement.IsWideChar || !singleStackFrame)
         {
             ThrowIf(csElement, StringMarshalType.WindowsRuntimeString);

@@ -79,25 +79,22 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
             if (field.ArraySpecification is { } arraySpecification)
             {
-                if (arraySpecification.Type == ArraySpecificationType.Dynamic)
+                FieldDeclarationSyntax ComputeType(ArraySpecification? arraySpec, string typeName, string fieldName, bool hasNativeValueType)
                 {
-                    yield return FieldDeclaration(VariableDeclaration(ParseTypeName($"{field.MarshalType.QualifiedName}*")))
-                                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                                .AddDeclarationVariables(VariableDeclarator(field.Name));
-                    yield break;
+                    var qualifiedName = typeName;
+                    if (hasNativeValueType) qualifiedName += ".__Native";
+                    if (arraySpec?.Type == ArraySpecificationType.Dynamic) qualifiedName += "*";
+
+                    return fieldDecl.WithDeclaration(VariableDeclaration(ParseTypeName(qualifiedName), SingletonSeparatedList(VariableDeclarator(fieldName))));
                 }
 
-                yield return fieldDecl.WithDeclaration(
-                    fieldDecl.Declaration.AddVariables(VariableDeclarator(field.Name))
-                );
+                yield return ComputeType(field.ArraySpecification, field.MarshalType.QualifiedName, field.Name, field.HasNativeValueType);
 
                 if (arraySpecification.Dimension is { } dimension)
                     for (var i = 1; i < dimension; i++)
                     {
-                        var declaration = fieldDecl.WithDeclaration(
-                            fieldDecl.Declaration.AddVariables(VariableDeclarator($"__{field.Name}{i}"))
-                        );
-
+                        var declaration = ComputeType(field.ArraySpecification, field.MarshalType.QualifiedName, $"__{field.Name}{i}", field.HasNativeValueType);
+                         
                         if (csStruct.ExplicitLayout)
                         {
                             var offset = field.Offset + i * field.Size / dimension;
@@ -153,7 +150,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
     private MethodDeclarationSyntax GenerateMarshalFree(CsStruct csStruct) => GenerateMarshalMethod(
         "__MarshalFree",
-        csStruct.Fields.Where(field => !(field.ArraySpecification?.Type == ArraySpecificationType.Constant)),
+        csStruct.Fields,
         field => GetMarshaller(field)?.GenerateNativeCleanup(field, false)
     );
 
@@ -171,7 +168,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             {
                 var marshaller = GetRelationMarshaller(relation);
                 if (relation is not LengthRelation related)
-                    yield return marshaller.GenerateManagedToNative(null, field);            
+                    yield return marshaller.GenerateManagedToNative(null, field);
             }
         }
 
