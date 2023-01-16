@@ -39,29 +39,32 @@ public sealed partial class NamingRulesManager
         new HungarianNotationPrefix("pwcs", HungarianStringPrefixSelector, "String", "Text"),
     };
 
-    private static int HungarianOutPrefixSelector(CppMarshallable x) => x is CppParameter {HasPointer: true}
-                                                                            ? 0
-                                                                            : -1;
+    private static int HungarianOutPrefixSelector(CppMarshallable x) => x switch
+    {
+        CppParameter { HasPointer: true } => 0,
+        CppField { HasPointer: true, Pointer: "**" } => 1,
+        _ => -1
+    };
 
     private static int HungarianRefPrefixSelector(CppMarshallable x) => x switch
     {
-        CppParameter {HasPointer: true} => 0,
-        CppField {HasPointer: true, IsArray: false, ArrayDimension: null or {Length: 0}} => 1,
-        CppField {IsArray: true} => 2,
+        CppParameter { HasPointer: true } => 0,
+        CppField { HasPointer: true, IsArray: false, ArrayDimension: null or { Length: 0 } } => 1,
+        CppField { IsArray: true } => 2,
         _ => -1
     };
 
     private static int HungarianIntegerPrefixSelector(CppMarshallable x) =>
-        x is {HasPointer: false, IsArray: false, ArrayDimension: null or {Length: 0}}
+        x is { HasPointer: false, IsArray: false, ArrayDimension: null or { Length: 0 } }
             ? 0
             : -1;
 
     private static int HungarianFunctionPrefixSelector(CppMarshallable x) =>
-        x is {IsArray: false, ArrayDimension: null or {Length: 0}}
+        x is { IsArray: false, ArrayDimension: null or { Length: 0 } }
             ? 0
             : -1;
 
-    private static int HungarianStringPrefixSelector(CppMarshallable x) => x is {HasPointer: true}
+    private static int HungarianStringPrefixSelector(CppMarshallable x) => x is { HasPointer: true }
                                                                                ? 0
                                                                                : -1;
 

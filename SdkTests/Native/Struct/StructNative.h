@@ -104,31 +104,31 @@ struct StructWithInterface
 
 struct StructWithDynamicArrayOfInterface
 {
-	Interface** interfaces;
+	Interface** ppInterfaces;
 	int interfaceCount;
 };
 
 struct StructWithDynamicArrayOfIntegralType
 {
-	int* elements;
+	int* pElements;
 	int elementCount;
 };
 
 struct StructWithDynamicArrayOfPrimitiveStruct
 {
-	SimpleStruct* structs;
+	SimpleStruct* pStructs;
 	int structCount;
 };
 
 struct StructWithDynamicArrayOfMarshaledStruct
 {
-	StructInheritanceB* structs;
+	StructInheritanceB* pStructs;
 	int structCount;
 };
 
 struct StructWithConstArrayOfInterface
 {
-	Interface* interfaces[8];
+	Interface* pInterfaces[8];
 };
 
 struct StructWithConstArrayOfIntegralType
@@ -141,7 +141,7 @@ struct StructWithConstArrayOfPrimitiveStruct
 	SimpleStruct structs[8];
 };
 
-struct StructWithConstrrayOfMarshaledStruct
+struct StructWithConstArrayOfMarshaledStruct
 {
 	StructInheritanceB structs[8];
 };

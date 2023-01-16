@@ -26,10 +26,10 @@
 		<map struct="(.*)Relation" marshalto="true" />
 		<map field="StructSizeRelation::cbSize" relation="struct-size()" />
 		<map field="ReservedRelation::reserved" relation="const(42)" />
-		<map field="StructWithDynamicArrayOfInterface::interfaceCount" relation="length(interfaces)" />
-		<map field="StructWithDynamicArrayOfIntegralType::elementCount" relation="length(elements)" />
-		<map field="StructWithDynamicArrayOfPrimitiveStruct::structCount"  relation="length(structs)" />
-		<map field="StructWithDynamicArrayOfMarshaledStruct::structCount"  relation="length(structs)" />
+		<map field="StructWithDynamicArrayOfInterface::interfaceCount" relation="length(ppInterfaces)" />
+		<map field="StructWithDynamicArrayOfIntegralType::elementCount" relation="length(pElements)" />
+		<map field="StructWithDynamicArrayOfPrimitiveStruct::structCount"  relation="length(pStructs)" />
+		<map field="StructWithDynamicArrayOfMarshaledStruct::structCount"  relation="length(pStructs)" />
 	</mapping>
 
 	<depends>SharpGen.Runtime</depends>
