@@ -126,6 +126,12 @@ struct StructWithDynamicArrayOfMarshaledStruct
 	int structCount;
 };
 
+struct StructWithDynamicArrayRecursive
+{
+	StructWithDynamicArrayRecursive* pStructs;
+	int structCount;
+};
+
 struct StructWithConstArrayOfInterface
 {
 	Interface* pInterfaces[8];
@@ -145,7 +151,6 @@ struct StructWithConstArrayOfMarshaledStruct
 {
 	StructInheritanceB structs[8];
 };
-
 
 struct PointerSizeMember
 {

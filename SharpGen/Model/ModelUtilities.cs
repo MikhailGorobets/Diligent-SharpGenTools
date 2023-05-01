@@ -121,8 +121,14 @@ public static class ModelUtilities
         if (withAdditionalItems)
             items = items.Concat(element.AdditionalItems);
 
-        foreach (var descendant in items.SelectMany(x => EnumerateDescendants(x, withAdditionalItems)))
-            yield return descendant;
+        foreach (var descendant in items) {
+
+            if (element is CsStruct @struct && descendant is CsField @field && @struct.Name == field.MarshalType.Name)
+                continue;
+
+            foreach(var item in EnumerateDescendants(descendant, withAdditionalItems))
+                 yield return item;
+        }
     }
 
     public static IEnumerable<T> EnumerateDescendants<T>(this CsBase element, bool withAdditionalItems = true)
