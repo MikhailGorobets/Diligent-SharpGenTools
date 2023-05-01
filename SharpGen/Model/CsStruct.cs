@@ -106,6 +106,9 @@ public sealed class CsStruct : CsTypeBase
 
             foreach (var field in Fields)
             {
+                if (field.MarshalType.Name == Name)
+                    return base.AlignmentCore;
+
                 var fieldAlignment = field.MarshalType.Alignment;
 
                 if (fieldAlignment is not { } value)
@@ -118,7 +121,7 @@ public sealed class CsStruct : CsTypeBase
         }
     }
 
-    public override bool IsBlittable => Fields.All(x => x.MarshalType.IsBlittable && !x.IsArray && !x.HasPointer);
+    public override bool IsBlittable => Fields.All(field => field.MarshalType.Name != Name && field.MarshalType.IsBlittable && !field.IsArray && !field.HasPointer);
 
     public bool IsFullyMapped { get; set; } = true;
 
@@ -137,7 +140,7 @@ public sealed class CsStruct : CsTypeBase
 
         foreach (var field in Fields)
         {
-            if (field.Relations.Count != 0)
+            if (field.PublicType.Name == this.Name || field.Relations.Count != 0)
                 hasMarshalType = true;
 
             var fieldHasMarshalType = field.PublicType != field.MarshalType

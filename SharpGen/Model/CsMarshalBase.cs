@@ -132,31 +132,28 @@ public abstract class CsMarshalBase : CsBase
 
     protected CsMarshalBase(Ioc ioc, CppElement cppElement, string name) : base(cppElement, name)
     {
-        if (cppElement is CppMarshallable cppMarshallable)
-        {
-            HasPointer = cppMarshallable.HasPointer;
-
-            ArraySpecification = ParseArrayDimensionValue(cppMarshallable.IsArray, cppMarshallable.ArrayDimension);
-        }
-
-        if (cppElement is { Rule: { StringMarshal: { } stringMarshal } })
-            StringMarshal = stringMarshal;
-
         ArraySpecification? ParseArrayDimensionValue(bool isArray, string arrayDimension)
         {
             if (!isArray || string.IsNullOrEmpty(arrayDimension))
                 return null;
 
             if (arrayDimension.Contains(","))
-            {
                 ioc.Logger.Warning(null, "SharpGen might not handle multidimensional arrays properly.");
-            }
 
             // TODO: handle multidimensional arrays
             return uint.TryParse(arrayDimension, out var arrayDimensionValue) && arrayDimensionValue >= 1
                        ? new ArraySpecification(arrayDimensionValue)
                        : null;
         }
+
+        if (cppElement is CppMarshallable cppMarshallable)
+        {
+            HasPointer = cppMarshallable.HasPointer;
+            ArraySpecification = ParseArrayDimensionValue(cppMarshallable.IsArray, cppMarshallable.ArrayDimension);
+        }
+
+        if (cppElement is { Rule: { StringMarshal: { } stringMarshal } })
+            StringMarshal = stringMarshal;
     }
 
     public override IEnumerable<CsBase> AdditionalItems => AppendNonNull(

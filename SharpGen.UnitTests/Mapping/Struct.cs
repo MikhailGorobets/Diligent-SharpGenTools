@@ -411,7 +411,6 @@ public class Struct : MappingTestBase
             }
         };
 
-
         var structure = new CppStruct("Test");
 
         structure.Add(new CppField("bitfield1")
@@ -536,15 +535,15 @@ public class Struct : MappingTestBase
         var structName = "Test";
         var config = new ConfigFile
         {
-            Id = nameof(InvalidLengthRelationInStruct),
-            Namespace = nameof(InvalidLengthRelationInStruct),
+            Id = nameof(LengthRelationInStruct),
+            Namespace = nameof(LengthRelationInStruct),
             Includes =
             {
                 new IncludeRule
                 {
                     File = "test.h",
                     Attach = true,
-                    Namespace = nameof(InvalidLengthRelationInStruct)
+                    Namespace = nameof(LengthRelationInStruct)
                 }
             },
             Bindings =
@@ -586,6 +585,72 @@ public class Struct : MappingTestBase
         var (solution, _) = MapModel(module, config);
 
         var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == structName);
+        Assert.NotNull(csStruct);
+
+        var field0 = csStruct.Fields.First(fld => fld.Name == "Elements");
+        var field1 = csStruct.Fields.First(fld => fld.Name == "Count");
+
+        Assert.NotNull(field0);
+        Assert.NotNull(field1);
+        Assert.Equal(ArraySpecificationType.Dynamic, field0.ArraySpecification?.Type);
+        Assert.Equal("Count", field0.ArraySpecification?.SizeIdentifier);
+    }
+
+    [Fact]
+    public void LengthRelationRecursiveInStruct()
+    {
+        var structName = "Test";
+        var config = new ConfigFile
+        {
+            Id = nameof(LengthRelationRecursiveInStruct),
+            Namespace = nameof(LengthRelationRecursiveInStruct),
+            Includes =
+            {
+                new IncludeRule
+                {
+                    File = "test.h",
+                    Attach = true,
+                    Namespace = nameof(LengthRelationRecursiveInStruct)
+                }
+            },
+            Bindings =
+            {
+                new BindRule("int", "System.Int32")
+            },
+            Mappings =
+            {
+                new MappingRule
+                {
+                    Field = $"{structName}::count",
+                    Relation = "length(elements)"
+                },
+            }
+        };
+
+        var structure = new CppStruct(structName);
+
+        structure.Add(new CppField("elements")
+        {
+            TypeName = structName,
+            Pointer = "*"
+        });
+        structure.Add(new CppField("count")
+        {
+            TypeName = "int",
+            Offset = 1,
+        });
+
+        var include = new CppInclude("test");
+        include.Add(structure);
+
+        var module = new CppModule("SharpGenTestModule");
+        module.Add(include);
+
+
+        var (solution, _) = MapModel(module, config);
+
+        var arr = solution.EnumerateDescendants<CsStruct>();
+        var csStruct = arr.First(@struct => @struct.Name == structName);
         Assert.NotNull(csStruct);
 
         var field0 = csStruct.Fields.First(fld => fld.Name == "Elements");
@@ -656,5 +721,75 @@ public class Struct : MappingTestBase
         {
             MapModel(module, config);
         }
+    }
+
+    
+    [Fact]
+    public void StupidTestStructRecursive()
+    {
+        var config = new ConfigFile
+        {
+            Id = nameof(StupidTestStructRecursive),
+            Namespace = nameof(StupidTestStructRecursive),
+            Includes =
+            {
+                new IncludeRule
+                {
+                    File = "test.h",
+                    Attach = true,
+                    Namespace = nameof(StupidTestStructRecursive)
+                }
+            },
+            Bindings =
+            {
+                new BindRule("int", "System.Int32")
+            },
+            Mappings =
+            {
+                new MappingRule
+                {
+                    Field = "TestB::count",
+                    Relation = "length(elements)"
+                },
+            }
+        };
+
+        var structureA = new CppStruct("TestA");
+
+        var structureB = new CppStruct("TestB");
+
+        structureB.Add(new CppField("elements")
+        {
+            TypeName = "TestA",
+            Pointer = "*"
+        });
+        structureB.Add(new CppField("count")
+        {
+            TypeName = "int",
+            Offset = 1,
+        });
+
+
+        var include = new CppInclude("test");
+
+        include.Add(structureA);
+        include.Add(structureB);
+
+        var module = new CppModule("SharpGenTestModule");
+        module.Add(include);
+
+
+        var (solution, _) = MapModel(module, config);
+
+        var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == "TestB");
+        Assert.NotNull(csStruct);
+
+        var field0 = csStruct.Fields.First(fld => fld.Name == "Elements");
+        var field1 = csStruct.Fields.First(fld => fld.Name == "Count");
+
+        Assert.NotNull(field0);
+        Assert.NotNull(field1);
+        Assert.Equal(ArraySpecificationType.Dynamic, field0.ArraySpecification?.Type);
+        Assert.Equal("Count", field0.ArraySpecification?.SizeIdentifier);
     }
 }

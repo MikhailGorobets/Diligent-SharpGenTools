@@ -159,7 +159,6 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
                     {
                         var csField = factory.Create(cppField, fieldName);
                         csStruct.Add(csField);
-
                         // If last field has same offset, then it's a union
                         // CurrentOffset is not moved
                         if (isNonSequential && previousFieldOffsetIndex != cppField.Offset)
@@ -196,8 +195,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
                         }
 
                         var nextFieldIndex = fieldIndex + 1;
-                        if (previousFieldOffsetIndex == cppField.Offset
-                         || nextFieldIndex < fieldCount && fields[nextFieldIndex].Offset == cppField.Offset)
+                        if (previousFieldOffsetIndex == cppField.Offset || nextFieldIndex < fieldCount && fields[nextFieldIndex].Offset == cppField.Offset)
                         {
                             if (previousFieldOffsetIndex != cppField.Offset)
                                 maxSizeOfField = 0;
@@ -262,13 +260,12 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
                     }
 
                     Debug.Assert(!relatedField.ArraySpecification.HasValue);
-                    relatedField.ArraySpecification = new ArraySpecification(field.Name, field.PublicType.Name);
+                    relatedField.ArraySpecification = new ArraySpecification(field.Name, field.MarshalType.Name);
                 }
             }
         }
-
+        
         //TODO Check count of pointers to arrays
-
         csStruct.StructSize = currentFieldAbsoluteOffset + previousFieldSize;
     }
 }
