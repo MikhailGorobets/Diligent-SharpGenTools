@@ -37,33 +37,76 @@ internal sealed partial class FieldCodeGenerator : MemberMultiCodeGeneratorBase<
 
             if (csElement.ArraySpecification?.Type == ArraySpecificationType.Constant)
             {
-                yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true);
+                var fieldDecl = FieldDeclaration(
+                        VariableDeclaration(ArrayType(elementType, SingletonList(ArrayRankSpecifier())),
+                            SingletonSeparatedList(
+                                VariableDeclarator(Identifier(csElement.IntermediateMarshalName)))))
+                        .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)));
 
-                yield return GenerateProperty(
-                    csElement, ArrayType(elementType, SingletonList(ArrayRankSpecifier())),
-                    value => AssignmentExpression(
-                        SyntaxKind.CoalesceAssignmentExpression,
-                        value,
-                        ObjectCreationExpression(
-                            ArrayType(
-                                elementType,
-                                SingletonList(
-                                    ArrayRankSpecifier(
-                                        SingletonSeparatedList<ExpressionSyntax>(
-                                            LiteralExpression(
-                                                SyntaxKind.NumericLiteralExpression,
-                                                Literal(csElement.ArrayDimensionValue)
-                                            )
-                                        )
-                                    )
+                yield return AddDocumentationTrivia(fieldDecl, csElement);
+
+                var indexVariable = Identifier("i");
+                var indexVariableName = IdentifierName("i");
+                var arrayIdentifierName = IdentifierName("value");
+
+                var assign = ParseStatement($"{csElement.IntermediateMarshalName} ??= new {csElement.PublicType.QualifiedName}[{csElement.ArrayDimensionValue}];");
+
+                var assert = ExpressionStatement(
+                    InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    ParseTypeName("System.Diagnostics"),
+                                    IdentifierName("Debug")),
+                                IdentifierName("Assert")))
+                        .AddArgumentListArguments(
+                            Argument(
+                                BinaryExpression(
+                                    SyntaxKind.LessThanOrEqualExpression,
+                                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, arrayIdentifierName, IdentifierName("Length")),
+                                    MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(csElement.IntermediateMarshalName), IdentifierName("Length"))))));
+
+
+                var loop = ForStatement(
+                    VariableDeclaration(
+                        PredefinedType(Token(SyntaxKind.IntKeyword)),
+                        SeparatedList(new[] { VariableDeclarator(indexVariable, default, EqualsValueClause(GeneratorHelpers.ZeroLiteral)) })),
+                    default,
+                    BinaryExpression(SyntaxKind.LessThanExpression, indexVariableName,
+                        GeneratorHelpers.LengthExpression(arrayIdentifierName)),
+                    SingletonSeparatedList<ExpressionSyntax>(
+                        PrefixUnaryExpression(SyntaxKind.PreIncrementExpression, indexVariableName)
+                    ), ExpressionStatement(
+                        AssignmentExpression(
+                            SyntaxKind.SimpleAssignmentExpression,
+                            ElementAccessExpression(IdentifierName(csElement.IntermediateMarshalName), BracketedArgumentList(SingletonSeparatedList(Argument(indexVariableName)))),
+                            ElementAccessExpression(arrayIdentifierName, BracketedArgumentList(SingletonSeparatedList(Argument(indexVariableName))))))
+                );
+
+                var setter = AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                    .WithBody(Block(assign, assert, loop));
+
+                var getter = AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                    .WithBody(Block(assign, ReturnStatement(IdentifierName(csElement.IntermediateMarshalName))));
+
+                yield return AddDocumentationTrivia(
+                    PropertyDeclaration(ArrayType(elementType, SingletonList(ArrayRankSpecifier())), csElement.Name)
+                        .WithAccessorList(
+                            AccessorList(
+                                List(
+                                    new[]
+                                    {
+                                        setter,
+                                        getter
+                                    }
                                 )
                             )
                         )
-                    ),
-                    null
+                        .WithModifiers(csElement.VisibilityTokenList),
+                    csElement
                 );
             }
-            else if (csElement.ArraySpecification?.Type == ArraySpecificationType.Dynamic) 
+            else if (csElement.ArraySpecification?.Type == ArraySpecificationType.Dynamic)
             {
                 yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true, propertyBacking: false, document: true);
             }
