@@ -53,7 +53,7 @@ internal sealed class ArrayOfInterfaceMarshaller : ArrayMarshallerBase
              CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
                 Block(
                     GenerateGCKeepAlive(csElement),
-                    ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")
+                    GenerateNativeMemoryFree(csElement)
                 ),
              _ => GenerateGCKeepAlive(csElement)
          };
