@@ -46,7 +46,7 @@ internal abstract partial class MarshallerBase
     protected static TypeSyntax VoidPtrType => GeneratorHelpers.VoidPtrType;
     protected static LiteralExpressionSyntax ZeroLiteral => GeneratorHelpers.ZeroLiteral;
 
-    private static bool IsNullable(CsMarshalBase marshallable) => marshallable is CsParameter {IsNullable: true};
+    private static bool IsNullable(CsMarshalBase marshallable) => marshallable is CsParameter { IsNullable: true };
 
     protected static StatementSyntax GenerateNullCheckIfNeeded(CsMarshalBase marshallable,
                                                                StatementSyntax statement) =>
@@ -116,7 +116,7 @@ internal abstract partial class MarshallerBase
 
         var marshalArgument = Argument(marshalElementExpr).WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword));
 
-        if (marshallable.PublicType is CsStruct {GenerateAsClass: true} structType &&
+        if (marshallable.PublicType is CsStruct { GenerateAsClass: true } structType &&
             marshalMethod == StructMarshalMethod.From)
         {
             var constructor = ObjectCreationExpression(ParseTypeName(structType.QualifiedName));
@@ -233,7 +233,7 @@ internal abstract partial class MarshallerBase
         ExpressionStatement(
             csElement switch
             {
-                CsParameter {IsFast: true, IsOut: true} => AssignmentExpression(
+                CsParameter { IsFast: true, IsOut: true } => AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
@@ -380,5 +380,39 @@ internal abstract partial class MarshallerBase
                     )
                 )
             )
+        );
+
+    protected static StatementSyntax GenerateFreeHGlobal(CsMarshalBase csElement) =>
+        ExpressionStatement(
+            InvocationExpression(
+                MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                    ParseExpression("System.Runtime.InteropServices.Marshal"),
+                    IdentifierName("FreeHGlobal")
+            ))
+        .WithArgumentList(
+            ArgumentList(
+                SingletonSeparatedList(
+                        Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.Name)))
+                        )
+                )
+            )
+    );
+
+    protected static StatementSyntax GenerateNativeMemoryFree(CsMarshalBase csElement) =>
+        ExpressionStatement(
+            InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        ParseExpression("System.Runtime.InteropServices.NativeMemory"),
+                        IdentifierName("Free")
+                    ))
+                .WithArgumentList(
+                    ArgumentList(
+                        SingletonSeparatedList(
+                            Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.Name)))
+                        )
+                    )
+                )
         );
 }

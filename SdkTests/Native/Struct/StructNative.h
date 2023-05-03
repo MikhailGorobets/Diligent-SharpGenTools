@@ -152,6 +152,18 @@ struct StructWithConstArrayOfMarshaledStruct
 	StructInheritanceB structs[8];
 };
 
+struct StructWithPointerIntegralType {
+	int* pElement;
+};
+
+struct StructWithPointerPrimitiveStruct {
+	SimpleStruct* pElement;
+};
+
+struct StructWithPointerMarshaledStruct {
+	StructInheritanceB* pElement;
+};
+
 struct PointerSizeMember
 {
 	size_t pointerSize;

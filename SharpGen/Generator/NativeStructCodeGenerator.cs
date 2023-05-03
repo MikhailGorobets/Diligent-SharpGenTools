@@ -111,18 +111,28 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             }
             else if (field.HasNativeValueType)
             {
+                var qualifiedName = field.MarshalType.QualifiedName;
+                qualifiedName += ".__Native";
+                if (field.HasPointer) qualifiedName += "*";
+
                 yield return fieldDecl.WithDeclaration(
                     VariableDeclaration(
-                        ParseTypeName($"{field.MarshalType.QualifiedName}.__Native"),
+                        ParseTypeName(qualifiedName),
                         SingletonSeparatedList(VariableDeclarator(field.Name))
                     )
                 );
             }
             else
             {
+                var qualifiedName = field.MarshalType.QualifiedName;
+                if (field.HasPointer && !field.IsInterface && !field.IsString) qualifiedName += "*";
+
                 yield return fieldDecl.WithDeclaration(
-                    fieldDecl.Declaration.AddVariables(VariableDeclarator(field.Name))
-                );
+                    VariableDeclaration(
+                        ParseTypeName(qualifiedName),
+                        SingletonSeparatedList(VariableDeclarator(field.Name))
+                    )
+                ); ;
             }
         }
     }
@@ -214,7 +224,6 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             if (field.Relations.Count == 0)
             {
                 yield return GetMarshaller(field).GenerateNativeToManaged(field, false);
-                yield break;
             }
         }
 

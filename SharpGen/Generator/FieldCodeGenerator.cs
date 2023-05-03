@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection.Metadata;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Model;
@@ -115,6 +114,18 @@ internal sealed partial class FieldCodeGenerator : MemberMultiCodeGeneratorBase<
                 throw new System.InvalidOperationException();
             }
 
+        }
+        else if (csElement.HasPointer && !csElement.IsInterface && !csElement.IsString)
+        {
+            var elementType = ParseTypeName(csElement.PublicType.QualifiedName);
+
+            var fieldDecl = FieldDeclaration(
+                    VariableDeclaration(NullableType(elementType),
+                        SingletonSeparatedList(
+                            VariableDeclarator(Identifier(csElement.Name)))))
+                .WithModifiers(csElement.VisibilityTokenList);
+
+            yield return AddDocumentationTrivia(fieldDecl, csElement);
         }
         else if (csElement.IsBitField)
         {

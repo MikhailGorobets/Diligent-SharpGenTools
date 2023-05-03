@@ -24,6 +24,7 @@ public sealed class MarshallingRegistry
             new BoolToIntMarshaller(ioc),
             new InterfaceMarshaller(ioc),
             new PointerSizeMarshaller(ioc),
+            new PointerFieldMarshaller(ioc),
             new StringMarshaller(ioc),
             new RemappedTypeMarshaller(ioc),
             new StructWithNativeTypeMarshaller(ioc),
