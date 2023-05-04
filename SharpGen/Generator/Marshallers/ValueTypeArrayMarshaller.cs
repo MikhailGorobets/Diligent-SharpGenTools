@@ -50,7 +50,7 @@ internal sealed partial class ValueTypeArrayMarshaller : MarshallerBase, IMarsha
         csElement switch
         {
             CsField { ArraySpecification.Type: ArraySpecificationType.Dynamic } =>
-                 Block(ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")),
+                 GenerateNativeMemoryFree(csElement),
             _ => null
         };
 

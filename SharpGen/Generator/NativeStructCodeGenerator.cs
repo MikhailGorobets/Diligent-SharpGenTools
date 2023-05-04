@@ -113,7 +113,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             {
                 var qualifiedName = field.MarshalType.QualifiedName;
                 qualifiedName += ".__Native";
-                if (field.HasPointer) qualifiedName += "*";
+                if (field.IsOptionalPointer) qualifiedName += "*";
 
                 yield return fieldDecl.WithDeclaration(
                     VariableDeclaration(
@@ -125,7 +125,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             else
             {
                 var qualifiedName = field.MarshalType.QualifiedName;
-                if (field.HasPointer && !field.IsInterface && !field.IsString) qualifiedName += "*";
+                if (field.IsOptionalPointer) qualifiedName += "*";
 
                 yield return fieldDecl.WithDeclaration(
                     VariableDeclaration(

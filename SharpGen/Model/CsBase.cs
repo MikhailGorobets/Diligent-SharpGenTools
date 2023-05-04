@@ -23,7 +23,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using SharpGen.Config;
 using SharpGen.CppModel;
