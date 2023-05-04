@@ -140,7 +140,7 @@ public sealed class CsStruct : CsTypeBase
 
         foreach (var field in Fields)
         {
-            if (field.HasPointer || field.PublicType.Name == Name || field.Relations.Count != 0)
+            if (field.IsOptionalPointer || field.PublicType.Name == Name || field.Relations.Count != 0)
                 hasMarshalType = true;
 
             var fieldHasMarshalType = field.PublicType != field.MarshalType

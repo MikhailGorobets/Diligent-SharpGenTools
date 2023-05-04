@@ -32,6 +32,7 @@ public sealed class CsField : CsMarshalBase
     public bool IsBitField { get; }
     public uint Offset { get; set; }
     public bool IsBoolBitField => BitMask == 1;
+    public bool IsOptionalPointer { get; }
 
     public CsField(Ioc ioc, CppField cppElement, string name) : base(ioc, cppElement, name)
     {
@@ -39,5 +40,6 @@ public sealed class CsField : CsMarshalBase
             return;
 
         IsBitField = cppElement.IsBitField;
+        IsOptionalPointer = cppElement.Rule.DiligentOptional ?? IsOptionalPointer;
     }
 }

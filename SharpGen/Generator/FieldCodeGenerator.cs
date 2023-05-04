@@ -115,7 +115,7 @@ internal sealed partial class FieldCodeGenerator : MemberMultiCodeGeneratorBase<
             }
 
         }
-        else if (csElement.HasPointer && !csElement.IsInterface && !csElement.IsString)
+        else if (csElement.IsOptionalPointer)
         {
             var elementType = ParseTypeName(csElement.PublicType.QualifiedName);
 

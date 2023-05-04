@@ -15,7 +15,7 @@ internal sealed class PointerFieldMarshaller : MarshallerBase, IMarshaller
     {
     }
 
-    public bool CanMarshal(CsMarshalBase csElement) => csElement is CsField { HasPointer: true, IsString: false, IsArray: false, IsInterface: false };
+    public bool CanMarshal(CsMarshalBase csElement) => csElement is CsField { IsOptionalPointer: true };
 
     public StatementSyntax GenerateManagedToNative(CsMarshalBase csElement, bool singleStackFrame)
     {
