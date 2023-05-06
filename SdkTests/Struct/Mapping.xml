@@ -20,6 +20,7 @@
 		<map function="PassThrough(.*)" name="PassThrough" />
 		<map struct="BitField2" native="true" />
 		<map struct="BoolToInt2" native="true" />
+		<map struct="StructInheritanceDiligent" diligent-inheritance="true" />
 		<map field="BoolToInt(.*)::test" type="bool" />
 		<map struct="CustomNativeNew" native="true" new="true" />
 		<map struct="CustomNativeNewNested" marshalto="true" />

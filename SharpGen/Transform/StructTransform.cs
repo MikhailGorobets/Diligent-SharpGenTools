@@ -100,9 +100,6 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
         // Set IsFullyMappy in order to avoid recursive mapping
         csStruct.IsFullyMapped = true;
 
-        // Get the associated CppStruct and CSharpTag
-        var cppStruct = (CppStruct) csStruct.CppElement;
-
         // If this structure need to me moved to another container, move it now
         foreach (var keyValuePair in _mapMoveStructToInner)
         {
@@ -125,18 +122,35 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
 
         uint maxSizeOfField = 0;
 
-        bool isNonSequential = false;
+        var isNonSequential = false;
 
-        int cumulatedBitOffset = 0;
+        var cumulatedBitOffset = 0;
+
+        var isInheritance = false;
 
         var inheritedStructs = new Stack<CppStruct>();
+
+        var cppStruct = (CppStruct) csStruct.CppElement;
+
         var currentStruct = cppStruct;
+
         while (currentStruct != null && currentStruct.Base != currentStruct.Name)
         {
             inheritedStructs.Push(currentStruct);
-            currentStruct = TypeRegistry.FindBoundType(currentStruct.Base)?.CppElement as CppStruct;
+            var baseType = (CsStruct)TypeRegistry.FindBoundType(currentStruct.Base);
+            currentStruct = baseType?.CppElement as CppStruct;
+            if (baseType is { IsInheritance: true })
+                isInheritance = true;
         }
 
+        if (isInheritance)
+        {
+            var item = inheritedStructs.Last();
+            csStruct.IsInheritance = true;
+            csStruct.BaseObject = (CsStruct)TypeRegistry.FindBoundType(item.Base);
+            inheritedStructs = new Stack<CppStruct>(new[] { item });
+        }
+        
         while (inheritedStructs.Count > 0)
         {
             currentStruct = inheritedStructs.Pop();
@@ -149,7 +163,7 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
             // -------------------------------------------------------------------------------
             // Iterate on all fields and perform mapping
             // -------------------------------------------------------------------------------
-            for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++)
+            for (var fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++)
             {
                 var cppField = fields[fieldIndex];
                 var fieldName = fieldNames[fieldIndex];

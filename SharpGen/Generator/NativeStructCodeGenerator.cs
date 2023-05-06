@@ -25,49 +25,16 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
     public override IEnumerable<MemberDeclarationSyntax> GenerateCode(CsStruct csStruct)
     {
-        yield return StructDeclaration("__Native")
-                    .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.PartialKeyword)))
-                    .WithAttributeLists(SingletonList(GenerateStructLayoutAttribute(csStruct)))
-                    .WithMembers(List(csStruct.Fields.SelectMany(GenerateMarshalStructField)));
-
-        if (csStruct.GenerateAsClass)
+        IEnumerable<MemberDeclarationSyntax> GenerateMarshalStructFieldBase()
         {
-            var methodName = IdentifierName("__MarshalFrom");
-            var marshalArgument = Argument(IdentifierName(MarshalParameterRefName))
-               .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword));
-
-            var invocationExpression = csStruct.IsStaticMarshal
-                                           ? InvocationExpression(
-                                               methodName,
-                                               ArgumentList(
-                                                   SeparatedList(
-                                                       new[]
-                                                       {
-                                                           Argument(ThisExpression())
-                                                              .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword)),
-                                                           marshalArgument
-                                                       }
-                                                   )
-                                               )
-                                           )
-                                           : InvocationExpression(
-                                               methodName,
-                                               ArgumentList(SingletonSeparatedList(marshalArgument))
-                                           );
-
-            yield return ConstructorDeclaration(csStruct.Name)
-                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                        .WithBody(Block());
-
-            yield return ConstructorDeclaration(csStruct.Name)
-                        .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)))
-                        .WithParameterList(MarshalParameterListSyntax)
-                        .WithBody(Block(ExpressionStatement(invocationExpression)));
+            if (csStruct.BaseObject != null)
+            {
+                yield return FieldDeclaration(
+                        VariableDeclaration(ParseTypeName(csStruct.BaseObject.QualifiedName + ".__Native"))
+                            .AddVariables(VariableDeclarator("Base")))
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword));
+            }
         }
-
-        yield return GenerateMarshalFree(csStruct);
-        yield return GenerateMarshalFrom(csStruct);
-        yield return GenerateMarshalTo(csStruct);
 
         IEnumerable<MemberDeclarationSyntax> GenerateMarshalStructField(CsField field)
         {
@@ -94,7 +61,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
                     for (var i = 1; i < dimension; i++)
                     {
                         var declaration = ComputeType(field.ArraySpecification, field.MarshalType.QualifiedName, $"__{field.Name}{i}", field.HasNativeValueType);
-                         
+
                         if (csStruct.ExplicitLayout)
                         {
                             var offset = field.Offset + i * field.Size / dimension;
@@ -135,6 +102,54 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
                 ); ;
             }
         }
+
+        yield return StructDeclaration("__Native")
+                    .WithModifiers(
+                        csStruct.BaseObject != null
+                            ? TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.NewKeyword))
+                            : TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword), Token(SyntaxKind.PartialKeyword))
+                    )
+                    .WithAttributeLists(SingletonList(GenerateStructLayoutAttribute(csStruct)))
+                    .WithMembers(List(GenerateMarshalStructFieldBase().Concat(csStruct.Fields.SelectMany(GenerateMarshalStructField))));
+
+        if (csStruct.GenerateAsClass)
+        {
+            var methodName = IdentifierName("__MarshalFrom");
+            var marshalArgument = Argument(IdentifierName(MarshalParameterRefName))
+               .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword));
+
+            var invocationExpression = csStruct.IsStaticMarshal
+                                           ? InvocationExpression(
+                                               methodName,
+                                               ArgumentList(
+                                                   SeparatedList(
+                                                       new[]
+                                                       {
+                                                           Argument(ThisExpression())
+                                                              .WithRefOrOutKeyword(Token(SyntaxKind.RefKeyword)),
+                                                           marshalArgument
+                                                       }
+                                                   )
+                                               )
+                                           )
+                                           : InvocationExpression(
+                                               methodName,
+                                               ArgumentList(SingletonSeparatedList(marshalArgument))
+                                           );
+
+            yield return ConstructorDeclaration(csStruct.Name)
+                        .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        .WithBody(Block());
+
+            yield return ConstructorDeclaration(csStruct.Name)
+                        .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)))
+                        .WithParameterList(MarshalParameterListSyntax)
+                        .WithBody(Block(ExpressionStatement(invocationExpression)));
+        }
+
+        yield return GenerateMarshalFree(csStruct);
+        yield return GenerateMarshalFrom(csStruct);
+        yield return GenerateMarshalTo(csStruct);
     }
 
     internal static AttributeListSyntax GenerateStructLayoutAttribute(CsStruct csElement) => AttributeList(
@@ -158,11 +173,20 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
         )
     );
 
-    private MethodDeclarationSyntax GenerateMarshalFree(CsStruct csStruct) => GenerateMarshalMethod(
-        "__MarshalFree",
-        csStruct.Fields,
-        field => GetMarshaller(field)?.GenerateNativeCleanup(field, false)
-    );
+    private MethodDeclarationSyntax GenerateMarshalFree(CsStruct csStruct)
+    {
+        IEnumerable<StatementSyntax> FieldMarshallers(CsField field)
+        {
+            yield return GetMarshaller(field)?.GenerateNativeCleanup(field, false);
+        }
+
+        return GenerateMarshalMethod(
+            "__MarshalFree",
+            csStruct.BaseObject != null,
+            csStruct.Fields,
+            FieldMarshallers
+        );
+    }
 
     private MethodDeclarationSyntax GenerateMarshalTo(CsStruct csStruct)
     {
@@ -184,38 +208,11 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
         return GenerateMarshalMethod(
             "__MarshalTo",
+            csStruct.BaseObject != null,
             csStruct.Fields,
             FieldMarshallers
         );
     }
-
-    private static ParameterListSyntax MarshalParameterListSyntax => ParameterList(
-        SingletonSeparatedList(Parameter(MarshalParameterRefName).WithType(RefType(ParseTypeName("__Native"))))
-    );
-
-    private MethodDeclarationSyntax GenerateMarshalMethod<T>(string name, IEnumerable<T> source,
-                                                             Func<T, StatementSyntax> transform)
-        where T : CsMarshalBase
-    {
-        var list = NewStatementList;
-        list.AddRange(source, transform);
-        return GenerateMarshalMethod(name, list);
-    }
-
-    private MethodDeclarationSyntax GenerateMarshalMethod<T>(string name, IEnumerable<T> source,
-                                                             Func<T, IEnumerable<StatementSyntax>> transform)
-        where T : CsMarshalBase
-    {
-        var list = NewStatementList;
-        list.AddRange(source, transform);
-        return GenerateMarshalMethod(name, list);
-    }
-
-    private static MethodDeclarationSyntax GenerateMarshalMethod(string name, StatementSyntaxList body) =>
-        MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), name)
-           .WithParameterList(MarshalParameterListSyntax)
-           .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword)))
-           .WithBody(body.ToBlock());
 
     private MethodDeclarationSyntax GenerateMarshalFrom(CsStruct csStruct)
     {
@@ -229,9 +226,43 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
         return GenerateMarshalMethod(
             "__MarshalFrom",
+            csStruct.BaseObject != null,
             csStruct.PublicFields,
             FieldMarshallers);
     }
+
+    private static ParameterListSyntax MarshalParameterListSyntax => ParameterList(
+        SingletonSeparatedList(Parameter(MarshalParameterRefName).WithType(RefType(ParseTypeName("__Native"))))
+    );
+
+    private MethodDeclarationSyntax GenerateMarshalMethod<T>(string name, bool generateBase, IEnumerable<T> source,
+                                                             Func<T, IEnumerable<StatementSyntax>> transform)
+        where T : CsMarshalBase
+    {
+
+        IEnumerable<StatementSyntax> BaseFieldMarshaller(string methodName, bool isHasBase)
+        {
+            if (isHasBase)
+            {
+                var arg = Argument(RefExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("@ref"), IdentifierName("Base"))));
+                var invoke = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, BaseExpression(), IdentifierName(methodName)),
+                    ArgumentList().AddArguments(arg)
+                );
+                yield return ExpressionStatement(invoke);
+            }
+        }
+
+        var list = NewStatementList;
+        list.AddRange(BaseFieldMarshaller(name, generateBase));
+        list.AddRange(source, transform);
+        return GenerateMarshalMethod(name, list);
+    }
+
+    private static MethodDeclarationSyntax GenerateMarshalMethod(string name, StatementSyntaxList body) =>
+        MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), name)
+           .WithParameterList(MarshalParameterListSyntax)
+           .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.UnsafeKeyword)))
+           .WithBody(body.ToBlock());
 
     public NativeStructCodeGenerator(Ioc ioc) : base(ioc)
     {
