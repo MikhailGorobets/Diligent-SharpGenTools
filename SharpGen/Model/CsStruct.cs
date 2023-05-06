@@ -31,7 +31,7 @@ namespace SharpGen.Model;
 public sealed class CsStruct : CsTypeBase
 {
     private CsBaseItemListCache<CsField> _fields;
-    private bool hasMarshalType, hasMarshalTypeFromFields;
+    private bool hasMarshalType, hasMarshalTypeFromFields, generateAsClass;
 
     public CsStruct(CppStruct cppStruct, string name) : base(cppStruct, name)
     {
@@ -41,8 +41,9 @@ public sealed class CsStruct : CsTypeBase
         var tag = cppStruct.Rule;
 
         Align = tag.StructPack ?? Align;
+        IsInheritance = tag.DiligentInheritance ?? IsInheritance;
         HasMarshalType = tag.StructHasNativeValueType ?? HasMarshalType;
-        GenerateAsClass = tag.StructToClass ?? GenerateAsClass;
+        GenerateAsClass = tag.StructToClass  ?? GenerateAsClass;
         HasCustomMarshal = tag.StructCustomMarshal ?? HasCustomMarshal;
         IsStaticMarshal = tag.IsStaticMarshal ?? IsStaticMarshal;
         HasCustomNew = tag.StructCustomNew ?? HasCustomNew;
@@ -51,6 +52,8 @@ public sealed class CsStruct : CsTypeBase
     public override uint Size => StructSize;
 
     public uint StructSize { private get; set; }
+
+    public CsStruct BaseObject { get; set; }
 
     /// <summary>
     ///   Packing alignment for this type (Default is 0 => Platform default)
@@ -83,8 +86,15 @@ public sealed class CsStruct : CsTypeBase
 
     public bool HasCustomMarshal { get; }
     public bool IsStaticMarshal { get; set; }
-    public bool GenerateAsClass { get; }
+
+    public bool GenerateAsClass
+    {
+        get => generateAsClass || IsInheritance;
+        set => generateAsClass = value;
+    }
+
     public bool HasCustomNew { get; set; }
+    public bool IsInheritance { get; set; }
 
     /// <summary>
     /// True if the native type this structure represents is a native primitive type

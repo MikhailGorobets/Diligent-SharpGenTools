@@ -164,6 +164,23 @@ struct StructWithPointerMarshaledStruct {
 	StructInheritanceB* pElement;
 };
 
+
+struct StructInheritanceDiligent
+{
+	const char* name;
+};
+
+struct StructInheritanceDiligentA : StructInheritanceDiligent
+{
+	int integer0;
+};
+
+struct StructInheritanceDiligentB : StructInheritanceDiligentA
+{
+	int integer1;
+};
+
+
 struct PointerSizeMember
 {
 	size_t pointerSize;

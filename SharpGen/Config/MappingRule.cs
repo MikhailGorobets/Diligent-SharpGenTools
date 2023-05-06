@@ -519,6 +519,19 @@ public class MappingRule : MappingBaseRule
         set => DiligentOptional = value;
     }
 
+    /// <summary>
+    ///     
+    /// </summary>
+    [XmlIgnore]
+    public bool? DiligentInheritance { get; set; }
+
+    [XmlAttribute("diligent-inheritance")]
+    public bool _DiligentInheritance_
+    {
+        get => DiligentInheritance.Value;
+        set => DiligentInheritance = value;
+    }
+
     public bool ShouldSerialize_MethodCheckReturnType_() => MethodCheckReturnType != null;
 
     public bool ShouldSerialize_AlwaysReturnHResult_() => AlwaysReturnHResult != null;
@@ -592,6 +605,8 @@ public class MappingRule : MappingBaseRule
     public bool ShouldSerialize_StringMarshal_() => StringMarshal != null;
 
     public bool ShouldSerialize_DiligentOptional_() => DiligentOptional != null;
+
+    public bool ShouldSerialize_DiligentInheritance_() => DiligentInheritance != null;
 
     public bool ShouldSerializeLayoutOffsetTranslate() => LayoutOffsetTranslate != default;
 }

@@ -33,6 +33,10 @@ internal sealed class StructCodeGenerator : MemberSingleCodeGeneratorBase<CsStru
 
         var modifierTokenList = csElement.VisibilityTokenList.Add(Token(SyntaxKind.PartialKeyword));
         var identifier = Identifier(csElement.Name);
+        var baseType = csElement.BaseObject != null
+            ? BaseList(Token(SyntaxKind.ColonToken),
+                SingletonSeparatedList((BaseTypeSyntax) SimpleBaseType(ParseTypeName(csElement.BaseObject.Name))))
+            : default;
 
         MemberDeclarationSyntax declaration = csElement.GenerateAsClass
                                                   ? ClassDeclaration(
@@ -40,7 +44,7 @@ internal sealed class StructCodeGenerator : MemberSingleCodeGeneratorBase<CsStru
                                                       modifierTokenList,
                                                       identifier,
                                                       default,
-                                                      default,
+                                                      baseType,
                                                       default,
                                                       List(list)
                                                   )
