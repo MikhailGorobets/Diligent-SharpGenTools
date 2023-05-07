@@ -70,11 +70,8 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
 
                         yield return declaration;
                     }
-                else
-                    Logger.Warning(
-                        LoggingCodes.UnknownArrayDimension, "Unknown array dimensions for [{0}]",
-                        field.QualifiedName
-                    );
+                else if (arraySpecification.Type != ArraySpecificationType.Dynamic || arraySpecification is { Type: ArraySpecificationType.Dynamic, SizeIdentifier: null })
+                    Logger.Warning(LoggingCodes.UnknownArrayDimension, $"Unknown array dimensions for [{field.QualifiedName}]");
             }
             else if (field.HasNativeValueType)
             {
