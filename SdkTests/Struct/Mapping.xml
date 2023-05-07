@@ -29,6 +29,7 @@
 		<map field="ReservedRelation::reserved" relation="const(42)" />
 		<map field="StructWithDynamicArrayOfInterface::interfaceCount" relation="length(ppInterfaces)" />
 		<map field="StructWithDynamicArrayOfIntegralType::elementCount" relation="length(pElements)" />
+		<map field="StructWithDynamicArrayOfString::elementCount" relation="length(pElements)" />
 		<map field="StructWithDynamicArrayOfPrimitiveStruct::structCount" relation="length(pStructs)" />
 		<map field="StructWithDynamicArrayOfMarshaledStruct::structCount" relation="length(pStructs)" />
 		<map field="StructWithDynamicArrayRecursive::structCount" relation="length(pStructs)" />

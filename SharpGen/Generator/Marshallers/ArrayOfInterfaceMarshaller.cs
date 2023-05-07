@@ -26,7 +26,7 @@ internal sealed class ArrayOfInterfaceMarshaller : ArrayMarshallerBase
                                 ParseExpression($"({csElement.ArraySpecification?.TypeSizeIdentifier}){csElement.Name}.Length")))
                 )),
             CsField { ArraySpecification.Type: ArraySpecificationType.Constant } =>
-             FixedStatement(
+                FixedStatement(
                     VariableDeclaration(
                     ParseTypeName($"{csElement.MarshalType.QualifiedName}*"),
                     SingletonSeparatedList(
