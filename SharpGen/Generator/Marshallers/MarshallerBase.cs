@@ -382,23 +382,6 @@ internal abstract partial class MarshallerBase
             )
         );
 
-    protected static StatementSyntax GenerateFreeHGlobal(CsMarshalBase csElement) =>
-        ExpressionStatement(
-            InvocationExpression(
-                MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                    ParseExpression("System.Runtime.InteropServices.Marshal"),
-                    IdentifierName("FreeHGlobal")
-            ))
-        .WithArgumentList(
-            ArgumentList(
-                SingletonSeparatedList(
-                        Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(MarshalParameterRefName), IdentifierName(csElement.Name)))
-                        )
-                )
-            )
-    );
-
     protected static StatementSyntax GenerateNativeMemoryFree(CsMarshalBase csElement) =>
         ExpressionStatement(
             InvocationExpression(

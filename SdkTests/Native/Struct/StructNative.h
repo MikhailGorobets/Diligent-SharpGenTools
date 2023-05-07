@@ -114,6 +114,13 @@ struct StructWithDynamicArrayOfIntegralType
 	int elementCount;
 };
 
+struct StructWithDynamicArrayOfString
+{
+	const char* const* pElements;
+	int  elementCount;
+};
+
+
 struct StructWithDynamicArrayOfPrimitiveStruct
 {
 	SimpleStruct* pStructs;
@@ -179,7 +186,6 @@ struct StructInheritanceDiligentB : StructInheritanceDiligentA
 {
 	int integer1;
 };
-
 
 struct PointerSizeMember
 {

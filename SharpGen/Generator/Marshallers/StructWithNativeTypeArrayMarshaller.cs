@@ -62,8 +62,8 @@ internal sealed class StructWithNativeTypeArrayMarshaller : ArrayMarshallerBase
                           csElement,
                           (publicElement, marshalElement) =>
                               CreateMarshalStructStatement(csElement, StructMarshalMethod.Free, publicElement, marshalElement)),
-                      ParseStatement($"System.Runtime.InteropServices.NativeMemory.Free(@ref.{csElement.Name});")
-               ),
+                      GenerateNativeMemoryFree(csElement)
+                ),
              CsField { ArraySpecification.Type: ArraySpecificationType.Constant } => FixedStatement(
                     VariableDeclaration(
                     ParseTypeName($"{csElement.PublicType.QualifiedName}.__Native*"),
@@ -105,7 +105,7 @@ internal sealed class StructWithNativeTypeArrayMarshaller : ArrayMarshallerBase
                         LoopThroughArrayParameter(csElement, (publicElement, marshalElement) => CreateMarshalStructStatement(csElement, StructMarshalMethod.From, publicElement, marshalElement))
                 )),
              CsField { ArraySpecification.Type: ArraySpecificationType.Constant } =>
-             FixedStatement(
+                FixedStatement(
                     VariableDeclaration(
                     ParseTypeName($"{csElement.PublicType.QualifiedName}.__Native*"),
                     SingletonSeparatedList(
