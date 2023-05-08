@@ -58,6 +58,12 @@ public class InterfaceTests
     }
 
     [Fact]
+    public void GuidCorrectlyAssociatedWithInterfaceEx()
+    {
+        Assert.Equal(Guid.Parse("{16410F4E-B4AB-4B33-B9A3-7FC8FA15F4F5}"), typeof(IInterfaceWithGuidEx).GUID);
+    }
+
+    [Fact]
     public void InnerInterfaceNativePointerKeptUpToDate()
     {
         var largeInterface = new ILargeInterface(IntPtr.Zero);

@@ -32,6 +32,15 @@ struct IInterfaceWithGuid
 extern "C" const GUID IID_IInterfaceWithGuid =
     {0x16410f4e, 0xb4ab, 0x4b33, {0xb9, 0xa3, 0x7f, 0xc8, 0xfa, 0x15, 0xf4, 0xf4}};
 
+struct IInterfaceWithGuidEx
+{
+    virtual void __stdcall Method() = 0;
+};
+
+// {16410F4E-B4AB-4B33-B9A3-7FC8FA15F4F5}
+extern "C" const GUID IID_InterfaceWithGuidEx =
+	{ 0x16410f4e, 0xb4ab, 0x4b33, {0xb9, 0xa3, 0x7f, 0xc8, 0xfa, 0x15, 0xf4, 0xf5} };
+
 struct ILargeInterface
 {
     virtual int __stdcall Method1() = 0;
