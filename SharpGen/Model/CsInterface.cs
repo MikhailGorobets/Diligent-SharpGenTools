@@ -64,7 +64,7 @@ public sealed class CsInterface : CsTypeBase
 
         var finder = new CppElementFinder(cppInterface.ParentInclude);
 
-        var cppGuid = finder.Find<CppGuid>("IID_" + cppInterface.Name).FirstOrDefault();
+        var cppGuid = finder.Find<CppGuid>("IID_(I?)" + cppInterface.Name.Remove(0, 1)).FirstOrDefault();
 
         return cppGuid != null
                    ? cppGuid.Guid.ToString()
