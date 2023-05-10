@@ -62,9 +62,10 @@ public sealed class CsStruct : CsTypeBase
 
     public IReadOnlyList<CsField> Fields => _fields.GetList(this);
 
-    public IEnumerable<CsField> PublicFields => _fields.Enumerate(this)
-                                                       .Where(field => field.Relations.Count == 0);
+    public IEnumerable<CsField> CallbacksFields => Fields.Where(field => field.DiligentCallback != null);
 
+    public IEnumerable<CsField> PublicFields => Fields.Where(field => field.Relations.Count == 0)
+                                                      .Where(field => CallbacksFields.All(e => e.DiligentCallback!.IdentifierReferenceName != field.Name));
     public IEnumerable<CsExpressionConstant> ExpressionConstants => Items.OfType<CsExpressionConstant>();
     public IEnumerable<CsGuidConstant> GuidConstants => Items.OfType<CsGuidConstant>();
     public IEnumerable<CsResultConstant> ResultConstants => Items.OfType<CsResultConstant>();
@@ -150,7 +151,7 @@ public sealed class CsStruct : CsTypeBase
 
         foreach (var field in Fields)
         {
-            if (field.IsOptionalPointer || field.PublicType.Name == Name || field.Relations.Count != 0)
+            if (field.IsOptionalPointer || field.DiligentCallback != null || field.PublicType.Name == Name || field.Relations.Count != 0)
                 hasMarshalType = true;
 
             var fieldHasMarshalType = field.PublicType != field.MarshalType

@@ -70,6 +70,8 @@ public static class LoggingCodes
 
     public const string SalAnnotationBlockMismatch = "SG0034";
 
+    public const string InvalidDiligentCallback = "SG0035";
+
     public const string CastXmlError = "CX0001";
 
     public const string CastXmlWarning = "CX0002";

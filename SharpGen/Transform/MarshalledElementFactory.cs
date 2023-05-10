@@ -127,8 +127,8 @@ public sealed class MarshalledElementFactory
 
         csMarshallable.PublicType = publicType;
         csMarshallable.MarshalType = marshalType;
-
         csMarshallable.Relations = RelationParser.ParseRelation(mappingRule.Relation, Logger);
+        csMarshallable.DiligentCallback = DiligentCallbackParser.ParseDiligentCallback(mappingRule.DiligentCallback, Logger);
     }
 
     private static CsFundamentalType PointerType(MappingRule mappingRule) => mappingRule.KeepPointers != true

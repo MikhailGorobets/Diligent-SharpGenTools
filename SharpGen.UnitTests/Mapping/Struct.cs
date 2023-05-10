@@ -792,4 +792,64 @@ public class Struct : MappingTestBase
         Assert.Equal(ArraySpecificationType.Dynamic, field0.ArraySpecification?.Type);
         Assert.Equal("Count", field0.ArraySpecification?.SizeIdentifier);
     }
+
+    [Fact]
+    public void PublicFieldsDiligentCallback()
+    {
+        var structName = "Test";
+        var config = new ConfigFile
+        {
+            Id = nameof(PublicFieldsDiligentCallback),
+            Namespace = nameof(PublicFieldsDiligentCallback),
+            Includes =
+            {
+                new IncludeRule
+                {
+                    File = "test.h",
+                    Attach = true,
+                    Namespace = nameof(PublicFieldsDiligentCallback)
+                }
+            },
+            Bindings =
+            {
+                new BindRule("int", "System.Int32")
+            },
+            Mappings =
+            {
+                new MappingRule
+                {
+                    Field = $"{structName}::ModifyCallback",
+                    DiligentCallback = "type(ModifyDelegate); pfn(pUserData)"
+                },
+            }
+        };
+
+        var structure = new CppStruct(structName);
+
+        structure.Add(new CppField("ModifyCallback")
+        {
+            TypeName = "int",
+            Pointer = "*"
+        });
+        structure.Add(new CppField("pUserData")
+        {
+            TypeName = "int",
+            Pointer = "*",
+            Offset = 1,
+        });
+
+        var include = new CppInclude("test");
+        include.Add(structure);
+
+        var module = new CppModule("SharpGenTestModule");
+        module.Add(include);
+
+        var (solution, _) = MapModel(module, config);
+
+        var csStruct = solution.EnumerateDescendants<CsStruct>().First(@struct => @struct.Name == structName);
+
+        Assert.NotNull(csStruct);
+        Assert.Single(csStruct.PublicFields);
+        Assert.Equal("ModifyCallback", csStruct.PublicFields.First().CppElementName);
+    }
 }

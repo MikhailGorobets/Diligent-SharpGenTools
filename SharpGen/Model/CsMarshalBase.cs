@@ -91,6 +91,8 @@ public abstract class CsMarshalBase : CsBase
         set => relations = value;
     }
 
+    public MarshallableDiligentCallback? DiligentCallback { get; set; }
+
     public bool IsBoolToInt => MarshalType is CsFundamentalType {IsIntegerType: true}
                             && PublicType == TypeRegistry.Boolean;
 

@@ -108,6 +108,21 @@ internal sealed partial class FieldCodeGenerator : MemberMultiCodeGeneratorBase<
         {
             yield return GenerateBackingField(csElement, csElement.PublicType, isArray: true, propertyBacking: false, document: true);
         }
+        else if (csElement.DiligentCallback != null)
+        {
+            yield return AddDocumentationTrivia(FieldDeclaration(
+                    VariableDeclaration(ParseTypeName(csElement.DiligentCallback.IdentifierType),
+                        SingletonSeparatedList(
+                            VariableDeclarator(Identifier(csElement.Name)))))
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword))), csElement);
+
+            yield return AddDocumentationTrivia(FieldDeclaration(
+                    VariableDeclaration(ParseTypeName("System.IntPtr"))
+                        .WithVariables(SingletonSeparatedList(VariableDeclarator(Identifier($"NativePFN{csElement.Name}"))
+                            .WithInitializer(EqualsValueClause(ParseExpression($"(System.IntPtr)(delegate* unmanaged[Cdecl]<System.IntPtr, System.IntPtr, void>)(&{csElement.Name}Impl)"))))))
+                .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.ReadOnlyKeyword), Token(SyntaxKind.UnsafeKeyword))),
+                    csElement);
+        }
         else if (csElement.IsOptionalPointer)
         {
             var elementType = ParseTypeName(csElement.PublicType.QualifiedName);
