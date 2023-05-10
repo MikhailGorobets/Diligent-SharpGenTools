@@ -155,6 +155,7 @@ public static class CppElementExtensions
         if (newRule.ManagedPartial is { } managedPartial) tag.ManagedPartial = managedPartial;
         if (newRule.NativePartial is { } nativePartial) tag.NativePartial = nativePartial;
         if (newRule.KeepPointers != null) tag.KeepPointers = newRule.KeepPointers;
+        if (newRule.GenerateConstructor != null) tag.GenerateConstructor = newRule.GenerateConstructor;
         if (newRule.DiligentOptional != null) tag.DiligentOptional = newRule.DiligentOptional;
         if (newRule.DiligentInheritance != null) tag.DiligentInheritance = newRule.DiligentInheritance;
         if (newRule.DiligentCallback != null) tag.DiligentCallback = newRule.DiligentCallback;

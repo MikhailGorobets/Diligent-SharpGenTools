@@ -31,7 +31,7 @@ namespace SharpGen.Model;
 public sealed class CsStruct : CsTypeBase
 {
     private CsBaseItemListCache<CsField> _fields;
-    private bool hasMarshalType, hasMarshalTypeFromFields, generateAsClass;
+    private bool hasMarshalType, hasMarshalTypeFromFields, generateAsClass, generateConstructor;
 
     public CsStruct(CppStruct cppStruct, string name) : base(cppStruct, name)
     {
@@ -47,6 +47,7 @@ public sealed class CsStruct : CsTypeBase
         HasCustomMarshal = tag.StructCustomMarshal ?? HasCustomMarshal;
         IsStaticMarshal = tag.IsStaticMarshal ?? IsStaticMarshal;
         HasCustomNew = tag.StructCustomNew ?? HasCustomNew;
+        GenerateConstructor = tag.GenerateConstructor ?? GenerateConstructor;
     }
 
     public override uint Size => StructSize;
@@ -92,6 +93,12 @@ public sealed class CsStruct : CsTypeBase
     {
         get => generateAsClass || IsInheritance;
         set => generateAsClass = value;
+    }
+
+    public bool GenerateConstructor
+    {
+        get => generateConstructor;
+        set => generateConstructor = value;
     }
 
     public bool HasCustomNew { get; set; }
