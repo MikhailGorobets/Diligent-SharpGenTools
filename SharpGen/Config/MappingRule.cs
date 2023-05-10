@@ -510,6 +510,19 @@ public class MappingRule : MappingBaseRule
     ///     
     /// </summary>
     [XmlIgnore]
+    public bool? GenerateConstructor { get; set; }
+
+    [XmlAttribute("generate-constructor")]
+    public bool _GenerateConstructor_
+    {
+        get => GenerateConstructor.Value;
+        set => GenerateConstructor = value;
+    }
+
+    /// <summary>
+    ///     
+    /// </summary>
+    [XmlIgnore]
     public bool? DiligentOptional { get; set; }
 
     [XmlAttribute("diligent-optional")]
@@ -606,6 +619,8 @@ public class MappingRule : MappingBaseRule
     public bool ShouldSerialize_KeepPointers_() => KeepPointers != null;
 
     public bool ShouldSerialize_StringMarshal_() => StringMarshal != null;
+
+    public bool ShouldSerialize_GenerateConstructor_() => GenerateConstructor != null;
 
     public bool ShouldSerialize_DiligentOptional_() => DiligentOptional != null;
 
