@@ -532,6 +532,9 @@ public class MappingRule : MappingBaseRule
         set => DiligentInheritance = value;
     }
 
+    [XmlAttribute("diligent-callback")]
+    public string DiligentCallback { get; set; }
+    
     public bool ShouldSerialize_MethodCheckReturnType_() => MethodCheckReturnType != null;
 
     public bool ShouldSerialize_AlwaysReturnHResult_() => AlwaysReturnHResult != null;

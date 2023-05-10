@@ -185,11 +185,53 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
         );
     }
 
+    private IEnumerable<StatementSyntax> GenerateMarshalToNativeForDiligentCallback(CsField field)
+    {
+        yield return ExpressionStatement(
+            AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("@ref"), IdentifierName(field.Name)),
+                ConditionalExpression(BinaryExpression(SyntaxKind.NotEqualsExpression, IdentifierName(field.Name), LiteralExpression(SyntaxKind.NullLiteralExpression)),
+                    IdentifierName($"NativePFN{field.Name}"), IdentifierName("System.IntPtr.Zero")))
+        );
+
+        yield return ExpressionStatement(
+            AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("@ref"),
+                IdentifierName(field.DiligentCallback!.IdentifierReferenceName)
+            ), ConditionalExpression(BinaryExpression(
+                SyntaxKind.NotEqualsExpression,
+                IdentifierName(field.Name),
+                LiteralExpression(SyntaxKind.NullLiteralExpression)
+            ), InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("System.Runtime.InteropServices.Marshal"),
+                    IdentifierName("GetFunctionPointerForDelegate")
+                ),
+                ArgumentList(
+                    SingletonSeparatedList(
+                        Argument(
+                            IdentifierName(field.Name)
+                        )
+                    )
+                )
+            ), IdentifierName("System.IntPtr.Zero")))
+        );
+    }
+
     private MethodDeclarationSyntax GenerateMarshalTo(CsStruct csStruct)
     {
         IEnumerable<StatementSyntax> FieldMarshallers(CsField field)
         {
-            if (field.Relations.Count == 0)
+            if (field.DiligentCallback != null)
+            {
+                foreach (var item in GenerateMarshalToNativeForDiligentCallback(field))
+                    yield return item;
+                yield break;
+            }
+
+            if (field.Relations.Count == 0 && csStruct.CallbacksFields.All(e => e.DiligentCallback!.IdentifierReferenceName != field.Name))
             {
                 yield return GetMarshaller(field).GenerateManagedToNative(field, false);
                 yield break;
@@ -198,7 +240,7 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
             foreach (var relation in field.Relations)
             {
                 var marshaller = GetRelationMarshaller(relation);
-                if (relation is not LengthRelation related)
+                if (relation is not LengthRelation)
                     yield return marshaller.GenerateManagedToNative(null, field);
             }
         }
@@ -215,10 +257,12 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
     {
         IEnumerable<StatementSyntax> FieldMarshallers(CsField field)
         {
-            if (field.Relations.Count == 0)
-            {
+            //TODO
+            if (field.DiligentCallback != null)
+                yield break;
+
+            if (field.Relations.Count == 0 && csStruct.CallbacksFields.All(e => e.DiligentCallback!.IdentifierReferenceName != field.Name))
                 yield return GetMarshaller(field).GenerateNativeToManaged(field, false);
-            }
         }
 
         return GenerateMarshalMethod(

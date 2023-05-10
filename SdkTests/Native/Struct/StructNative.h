@@ -87,6 +87,7 @@ struct BoolArray
 };
 
 struct CustomNativeNew {};
+
 struct CustomNativeNewNested
 {
 	CustomNativeNew Nested;
@@ -94,7 +95,7 @@ struct CustomNativeNewNested
 
 struct Interface
 {
-	virtual int One()=0;
+	virtual int One() = 0;
 };
 
 struct StructWithInterface
@@ -159,18 +160,20 @@ struct StructWithConstArrayOfMarshaledStruct
 	StructInheritanceB structs[8];
 };
 
-struct StructWithPointerIntegralType {
+struct StructWithPointerIntegralType 
+{
 	int* pElement;
 };
 
-struct StructWithPointerPrimitiveStruct {
+struct StructWithPointerPrimitiveStruct 
+{
 	SimpleStruct* pElement;
 };
 
-struct StructWithPointerMarshaledStruct {
+struct StructWithPointerMarshaledStruct 
+{
 	StructInheritanceB* pElement;
 };
-
 
 struct StructInheritanceDiligent
 {
@@ -185,6 +188,12 @@ struct StructInheritanceDiligentA : StructInheritanceDiligent
 struct StructInheritanceDiligentB : StructInheritanceDiligentA
 {
 	int integer1;
+};
+
+struct StructWithCallback
+{
+	void (*ModifyCallback)(StructWithPointerIntegralType& item, void* pUserData);
+	void* pUserData;
 };
 
 struct PointerSizeMember

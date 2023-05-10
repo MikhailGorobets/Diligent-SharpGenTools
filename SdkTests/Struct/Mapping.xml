@@ -36,6 +36,7 @@
 		<map field="StructWithPointerIntegralType::pElement" diligent-optional="true" />
 		<map field="StructWithPointerPrimitiveStruct::pElement" diligent-optional="true" />
 		<map field="StructWithPointerMarshaledStruct::pElement" diligent-optional="true" />
+		<map field="StructWithCallback::ModifyCallback" diligent-callback="type(ModifyDelegate); pfn(pUserData)"/>
 	</mapping>
 	<depends>SharpGen.Runtime</depends>
 </config>

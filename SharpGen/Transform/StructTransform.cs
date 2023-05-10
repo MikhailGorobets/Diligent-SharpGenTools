@@ -278,7 +278,14 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
                 }
             }
         }
-        
+
+        //Path relation names
+        foreach (var field in csStruct.CallbacksFields)
+        {
+            var relatedField = csStruct.Fields.First(e => e.CppElementName == field.DiligentCallback!.IdentifierReferenceName);
+            field.DiligentCallback!.IdentifierReferenceName = relatedField.Name;
+        }
+
         //TODO Check count of pointers to arrays
         csStruct.StructSize = currentFieldAbsoluteOffset + previousFieldSize;
     }

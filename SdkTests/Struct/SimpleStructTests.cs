@@ -1,7 +1,22 @@
 using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Xunit;
 
 namespace Struct;
+
+public partial struct StructWithCallback
+{
+    public delegate void ModifyDelegate(ref SimpleStruct desc);
+
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    private static unsafe void ModifyCallbackImpl(IntPtr desc, IntPtr pUserData) { }
+}
+
+public static class Native
+{
+    public delegate void ModifyDelegate(ref SimpleStruct desc);
+}
 
 public class SimpleStructTests
 {
