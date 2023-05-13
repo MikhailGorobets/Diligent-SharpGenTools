@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpGen.Logging;
@@ -68,7 +70,7 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
 
                 CsParameter relatedParameter = null;
 
-                if (relation is LengthRelation {Identifier: {Length: >0} relatedMarshallableName})
+                if (relation is LengthRelation { Identifier: { Length: > 0 } relatedMarshallableName })
                 {
                     relatedParameter = csElement.Parameters
                                                 .SingleOrDefault(
@@ -93,16 +95,31 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
 
             statements.AddRange(
                 param,
-                static(marshaller, item) => marshaller.GenerateManagedToNativeProlog(item)
+                static (marshaller, item) => marshaller.GenerateManagedToNativeProlog(item)
             );
         }
 
         if (csElement.HasReturnType)
         {
-            statements.Add(GenerateManagedHiddenMarshallableProlog(csElement.ReturnValue));
+            if (csElement.ReturnValue.HasPointer 
+                && !csElement.ReturnValue.HasNativeValueType 
+                && csElement.ReturnValue.PublicType is CsStruct)
+            {
+                statements.Add(LocalDeclarationStatement(
+                    VariableDeclaration(
+                        ParseTypeName($"{csElement.ReturnValue.PublicType.QualifiedName}*"),
+                        SingletonSeparatedList(VariableDeclarator(csElement.ReturnValue.Name))
+                    )
+                ));
+            }
+            else
+            {
+                statements.Add(GenerateManagedHiddenMarshallableProlog(csElement.ReturnValue));
+            }
+
             statements.AddRange(
                 csElement.ReturnValue,
-                static(marshaller, item) => marshaller.GenerateManagedToNativeProlog(item)
+                static (marshaller, item) => marshaller.GenerateManagedToNativeProlog(item)
             );
         }
 
@@ -136,11 +153,13 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
         );
 
         if (csElement.HasReturnType)
+        {
             statements.Add(
                 csElement.ReturnValue,
                 static (marshaller, item) => marshaller.GenerateNativeToManaged(item, true)
             );
-
+        }
+        
         statements.AddRange(
             csElement.InRefInRefParameters,
             static (marshaller, item) => marshaller.GenerateNativeCleanup(item, true)
@@ -159,7 +178,13 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
         // Return
         if (csElement.HasReturnStatement)
         {
-            statements.Add(ReturnStatement(IdentifierName(csElement.ReturnName)));
+            ExpressionSyntax expression = IdentifierName(csElement.ReturnName);
+            if (csElement.ReturnValue.HasPointer 
+                && !csElement.ReturnValue.HasNativeValueType 
+                && csElement.ReturnValue.PublicType is CsStruct)
+                expression = PrefixUnaryExpression(SyntaxKind.PointerIndirectionExpression, expression);
+
+            statements.Add(ReturnStatement(expression));
         }
 
         return methodDeclaration.WithBody(statements.ToBlock());

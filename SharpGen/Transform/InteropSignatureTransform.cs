@@ -175,9 +175,14 @@ internal sealed class InteropSignatureTransform : IInteropSignatureTransform
                 return interopType;
             }
 
-            return returnValue.HasNativeValueType
-                       ? $"{returnValue.MarshalType.QualifiedName}.__Native"
-                       : returnValue.MarshalType.QualifiedName;
+            var result = returnValue.HasNativeValueType
+                ? $"{returnValue.MarshalType.QualifiedName}.__Native"
+                : returnValue.MarshalType.QualifiedName;
+
+            if (returnValue.HasPointer)
+                result += "*";
+
+            return result;
         }
 
         if (returnValue.MarshalType is CsFundamentalType fundamentalReturn)

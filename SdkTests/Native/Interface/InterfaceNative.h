@@ -66,6 +66,23 @@ struct InterfaceWithProperties
     virtual RESULT __stdcall GetSelfOutPersistent(InterfaceWithProperties** child) = 0;
 };
 
+struct ReturnPtrDescBase0 
+{
+    int element;
+};
+
+struct ReturnPtrDescBase1 
+{
+    const char* element = nullptr;
+};
+
+struct IReturnDescPtr 
+{
+    virtual const ReturnPtrDescBase0& GetDesc0() const = 0;
+
+    virtual const ReturnPtrDescBase1& GetDesc1() const = 0;
+};
+
 extern "C" __declspec(dllexport) IInterface2* __stdcall CreateInstance(void);
 
 extern "C" __declspec(dllexport) IInterface* __stdcall CreateInstance2(int i, double j);

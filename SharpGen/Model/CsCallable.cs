@@ -92,8 +92,8 @@ public abstract class CsCallable : CsBase, IExpiring
     // Workaround for https://github.com/dotnet/runtime/issues/10901. This workaround is sufficient
     // for DirectX on Windows x86 and x64. It may produce incorrect code on other platforms depending
     // on the calling convention details.
-    public bool IsReturnStructLarge => ReturnValue.MarshalType is CsStruct { IsNativePrimitive: false } csStruct
-                                    && csStruct.Size > MaxSizeReturnParameter;
+    public bool IsReturnStructLarge => ReturnValue.MarshalType is CsStruct { IsNativePrimitive: false  } csStruct
+                                    && csStruct.Size > MaxSizeReturnParameter && !ReturnValue.HasPointer;
 
     public IReadOnlyDictionary<PlatformDetectionType, InteropMethodSignature> InteropSignatures
     {

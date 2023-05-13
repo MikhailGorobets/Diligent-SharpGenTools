@@ -26,6 +26,8 @@ using SharpGen.Generator;
 using SharpGen.Transform;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
+#nullable enable
+
 namespace SharpGen.Model;
 
 public sealed class CsMethod : CsCallable
@@ -46,7 +48,6 @@ public sealed class CsMethod : CsCallable
         NativePartial = tag.NativePartial ?? NativePartial;
         CustomVtbl = tag.CustomVtbl ?? CustomVtbl;
         IsKeepImplementPublic = tag.IsKeepImplementPublic ?? IsKeepImplementPublic;
-
         // Apply any offset to the method's vtable
         var offset = tag.LayoutOffsetTranslate;
 
