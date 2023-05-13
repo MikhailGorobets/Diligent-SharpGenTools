@@ -8,7 +8,7 @@ Param(
 )
 
 $Hint = "$TargetFramework-$Platform"
-$Parameters = @("-p:TargetFramework=$TargetFramework", "-p:TargetPlatform=$Platform", "-p:Platform=$Platform") + $AdditionalParameters
+$Parameters = @("-p:TargetFramework=$TargetFramework", "-p:PlatformTarget=$Platform", "-p:Platform=$Platform") + $AdditionalParameters
 
 foreach ($test in $Projects) {
     Remove-Item -Recurse -Force "$RepoRoot/SdkTests/$test/bin" -ErrorAction Ignore

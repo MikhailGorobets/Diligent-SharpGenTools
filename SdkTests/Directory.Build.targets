@@ -1,7 +1,7 @@
 <Project>
     <Target Name="LayoutNative" AfterTargets="Build" Condition="'$(SdkTestNative)' != ''">
         <PropertyGroup>
-            <SdkTestNativeFilePath>$(MSBuildThisFileDirectory)Native\$(TargetPlatform)\$(SdkTestNative)\$(SdkTestNative)Native</SdkTestNativeFilePath>
+            <SdkTestNativeFilePath>$(MSBuildThisFileDirectory)Native\$(PlatformTarget)\$(SdkTestNative)\$(SdkTestNative)Native</SdkTestNativeFilePath>
         </PropertyGroup>
         <ItemGroup>
             <SdkTestNativeFiles Include="$(SdkTestNativeFilePath).dll" />

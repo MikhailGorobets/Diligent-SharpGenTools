@@ -101,11 +101,15 @@ internal sealed class StructWithNativeTypeMarshaller : MarshallerBase, IMarshall
                 IdentifierName("Value"));
         }
 
+        var nativeElementExpression = GetMarshalStorageLocation(csElement);
+        if (csElement is CsReturnValue && csElement.HasPointer)
+            nativeElementExpression = PrefixUnaryExpression(SyntaxKind.PointerIndirectionExpression, nativeElementExpression);
+        
         return CreateMarshalStructStatement(
             csElement,
             StructMarshalMethod.From,
             publicElementExpression,
-            GetMarshalStorageLocation(csElement)
+            nativeElementExpression
         );
     }
 
@@ -116,8 +120,13 @@ internal sealed class StructWithNativeTypeMarshaller : MarshallerBase, IMarshall
 
     public bool GeneratesMarshalVariable(CsMarshalCallableBase csElement) => true;
 
-    public TypeSyntax GetMarshalTypeSyntax(CsMarshalBase csElement) =>
-        ParseTypeName($"{csElement.PublicType.QualifiedName}.__Native");
+    public TypeSyntax GetMarshalTypeSyntax(CsMarshalBase csElement)
+    {
+        var result = $"{csElement.PublicType.QualifiedName}.__Native";
+        if (csElement is CsReturnValue && csElement.HasPointer)
+            result += "*";
+        return ParseTypeName(result);
+    }
 
     public StructWithNativeTypeMarshaller(Ioc ioc) : base(ioc)
     {

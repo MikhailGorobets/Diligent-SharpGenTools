@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(BuildingByReSharper)' == 'true'">
-        <TargetPlatform>x64</TargetPlatform>
+        <PlatformTarget>x64</PlatformTarget>
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <Target Name="SharpGenSdkTestsVerifyPlatform" BeforeTargets="BeforeCompile;CoreCompile">
-        <Error Text="TargetPlatform isn't set"  Condition="'$(TargetPlatform)' != 'x86' and '$(TargetPlatform)' != 'x64'"/>
+        <Error Text="PlatformTarget isn't set"  Condition="'$(PlatformTarget)' != 'x86' and '$(PlatformTarget)' != 'x64'"/>
     </Target>
 
     <Target Name="SharpGenSetRoslynGeneratedPath">

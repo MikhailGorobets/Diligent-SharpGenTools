@@ -101,9 +101,13 @@ internal sealed class NativeInvocationCodeGenerator : ExpressionPlatformSingleCo
         if (interopSig.ForcedReturnBufferSig || !callable.HasReturnType)
             return call;
 
+        var pointerLargeStruct = callable.ReturnValue.HasPointer && callable.ReturnValue.PublicType is CsStruct;
         var generatesMarshalVariable = GetMarshaller(callable.ReturnValue).GeneratesMarshalVariable(callable.ReturnValue);
         var publicTypeSyntax = ReverseCallablePrologCodeGenerator.GetPublicType(callable.ReturnValue);
-        if (callable.HasReturnTypeValue && !generatesMarshalVariable && !publicTypeSyntax.IsEquivalentTo(interopSig.ReturnTypeSyntax))
+        if (callable.HasReturnTypeValue 
+            && !pointerLargeStruct
+            && !generatesMarshalVariable 
+            && !publicTypeSyntax.IsEquivalentTo(interopSig.ReturnTypeSyntax))
             call = CastExpression(publicTypeSyntax, call);
 
         return AssignmentExpression(
