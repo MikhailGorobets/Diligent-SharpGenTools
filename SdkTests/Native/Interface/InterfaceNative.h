@@ -76,11 +76,30 @@ struct ReturnPtrDescBase1
     const char* element = nullptr;
 };
 
+struct ReturnPtrDesc0: public ReturnPtrDescBase0
+{
+   
+};
+
+struct ReturnPtrDesc1: public ReturnPtrDescBase1
+{
+   
+};
+
 struct IReturnDescPtr 
 {
     virtual const ReturnPtrDescBase0& GetDesc0() const = 0;
 
     virtual const ReturnPtrDescBase1& GetDesc1() const = 0;
+
+    virtual const ReturnPtrDescBase0& GetDesc2() const = 0;
+};
+
+struct IReturnDerivedDescPtr: public IReturnDescPtr
+{
+    virtual const ReturnPtrDesc0& GetDesc0() const override = 0;
+
+    virtual const ReturnPtrDesc1& GetDesc1() const override = 0;
 };
 
 extern "C" __declspec(dllexport) IInterface2* __stdcall CreateInstance(void);

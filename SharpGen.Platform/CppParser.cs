@@ -258,7 +258,7 @@ public sealed class CppParser
     {
         foreach (var xTypedef in doc.Elements("CastXML").Elements(CastXml.TagTypedef))
         {
-            var xStruct = ResolveElaboratedType(xTypedef); 
+            var xStruct = ResolveElaboratedType(xTypedef);
 
             switch (xStruct.Name.LocalName)
             {
@@ -513,8 +513,7 @@ public sealed class CppParser
         // Calculate offset method using inheritance
         var offsetMethod = 0;
 
-        var basesValue = xElement.AttributeValue("bases");
-        var bases = basesValue?.Split(' ') ?? Enumerable.Empty<string>();
+        var bases = xElement.AttributeValue("bases")?.Split(' ') ?? Enumerable.Empty<string>();
         foreach (var xElementBaseId in bases)
         {
             if (string.IsNullOrEmpty(xElementBaseId))
@@ -541,19 +540,32 @@ public sealed class CppParser
         // Parse methods
         foreach (var method in xElement.Elements())
         {
-            // Parse method with pure virtual (=0) and that do not override any other methods
-            if (method.Name.LocalName == "Method" && !string.IsNullOrWhiteSpace(method.AttributeValue("pure_virtual"))
-                                                  && string.IsNullOrWhiteSpace(method.AttributeValue("overrides")))
+            switch (method.Name.LocalName)
             {
-                CppMethod cppMethod = new(method.AttributeValue("name"));
-                ParseCallable(cppMethod, method);
-                methods.Add(cppMethod);
-                cppMethod.Offset = offsetMethod++;
+                // Parse method with pure virtual (=0) and that do not override any other methods
+                case "Method" when !string.IsNullOrWhiteSpace(method.AttributeValue("pure_virtual")) 
+                                   && string.IsNullOrWhiteSpace(method.AttributeValue("overrides")):
+                {
+                    CppMethod cppMethod = new(method.AttributeValue("name"));
+                    ParseCallable(cppMethod, method);
+                    methods.Add(cppMethod);
+                    cppMethod.Offset = offsetMethod++;
+                    break;
+                }
+                case "Method" when !string.IsNullOrWhiteSpace(method.AttributeValue("pure_virtual")) 
+                                   && !string.IsNullOrWhiteSpace(method.AttributeValue("overrides")):
+                {
+                    CppMethod cppMethod = new(method.AttributeValue("name"));
+                    ParseCallable(cppMethod, method);
+                    methods.Add(cppMethod);
+                    cppMethod.Offset = -1;
+                    break;
+                }
             }
         }
 
         SetMethodsWindowsOffset(methods, offsetMethodBase);
-
+        
         // Add the methods to the interface with the correct offsets
         foreach (var cppMethod in methods)
         {
@@ -675,12 +687,12 @@ public sealed class CppParser
 
             // Test if the field type is declared inside this struct or union
             var fieldName = field.AttributeValue("name");
-            var fieldType = ResolveElaboratedType(field); 
+            var fieldType = ResolveElaboratedType(field);
 
             if (fieldType.AttributeValue("context") == xElement.AttributeValue("id"))
             {
                 var fieldSubStruct = ParseStructOrUnion(fieldType, cppStruct, innerStructCount++);
-                    
+
                 // If fieldName is empty, then we need to inline fields from the struct/union.
                 if (string.IsNullOrEmpty(fieldName))
                 {
@@ -879,11 +891,11 @@ public sealed class CppParser
             if (!long.TryParse(guidElement, out var value))
                 return null;
 
-            values[i] = unchecked((int)value);
+            values[i] = unchecked((int) value);
         }
 
-        return new Guid(values[0], (short)values[1], (short)values[2], (byte)values[3], (byte)values[4], (byte)values[5], (byte)values[6], (byte)values[7],
-                        (byte)values[8], (byte)values[9], (byte)values[10]);
+        return new Guid(values[0], (short) values[1], (short) values[2], (byte) values[3], (byte) values[4], (byte) values[5], (byte) values[6], (byte) values[7],
+                        (byte) values[8], (byte) values[9], (byte) values[10]);
     }
 
     /// <summary>
@@ -969,7 +981,7 @@ public sealed class CppParser
                 break;
             case CastXml.TagClass:
             case CastXml.TagStruct:
-                return xElement.AttributeValue("abstract") != null ? (CppElement)ParseInterface(xElement) : ParseStructOrUnion(xElement);
+                return xElement.AttributeValue("abstract") != null ? (CppElement) ParseInterface(xElement) : ParseStructOrUnion(xElement);
             case CastXml.TagUnion:
                 return ParseStructOrUnion(xElement);
             case CastXml.TagVariable:

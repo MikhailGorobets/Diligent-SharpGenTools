@@ -62,9 +62,10 @@ public sealed class CsMethod : CsCallable
     public bool? AllowProperty { get; }
     public bool CustomVtbl { get; }
     public bool IsPersistent { get; }
-    public int Offset { get; }
-    public int WindowsOffset { get; }
-
+    public bool IsOverride { get; set; }
+    public int Offset { get; set; }
+    public int WindowsOffset { get; set; }
+    
     public ExpressionSyntax VTableOffsetExpression(PlatformDetectionType platform)
     {
         int windowsOffset = WindowsOffset, offset = Offset;

@@ -126,6 +126,30 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
         return cSharpInterface;
     }
 
+    private static void PatchOverrideMethods(TypeRegistry typeRegistry, CsInterface interfaceType)
+    {
+        var recursiveMethods = new List<CsMethod>();
+        var currentInterface = interfaceType;
+        while (currentInterface is { Base: not null })
+        {
+            var cppInterface = (CppInterface) currentInterface.CppElement;
+            currentInterface = (CsInterface) typeRegistry.FindBoundType(cppInterface.Base);
+            if (currentInterface != null)
+                recursiveMethods.AddRange(currentInterface.Methods);
+        }
+
+        foreach (var method in interfaceType.Methods)
+        {
+            if (method.Offset == -1)
+            {
+                var relatedMethod = recursiveMethods.First(x => x.Name == method.Name);
+                method.Offset = relatedMethod.Offset;
+                method.WindowsOffset = relatedMethod.WindowsOffset;
+                method.IsOverride = true;
+            }
+        }
+    }
+
     /// <summary>
     /// Processes the specified interface type.
     /// </summary>
@@ -138,12 +162,12 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
         // Set IsFullyMapped to avoid recursive mapping
         interfaceType.IsFullyMapped = true;
 
-        var cppInterface = (CppInterface)interfaceType.CppElement;
-            
+        var cppInterface = (CppInterface) interfaceType.CppElement;
+
         var baseType = TypeRegistry.FindBoundType(cppInterface.Base);
         if (baseType != null)
         {
-            interfaceType.Base = (CsInterface)baseType;
+            interfaceType.Base = (CsInterface) baseType;
 
             // Process base if it's not mapped already
             if (!interfaceType.Base.IsFullyMapped)
@@ -181,7 +205,7 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
             interfaceType.Parent.Add(nativeCallback);
             CreateProperties(nativeCallback.Methods);
         }
-        else if (!interfaceType.IsCallback && interfaceType.Base is {IsDualCallback: true})
+        else if (!interfaceType.IsCallback && interfaceType.Base is { IsDualCallback: true })
         {
             interfaceType.Base = interfaceType.Base.GetNativeImplementationOrThis();
         }
@@ -192,6 +216,7 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
             interfaceType.Base ??= DefaultCallbackable;
 
         CreateProperties(methods);
+        PatchOverrideMethods(TypeRegistry, interfaceType);
     }
 
     private void MoveMethodsToInnerInterfaces(CsInterface interfaceType)
@@ -226,7 +251,7 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
                 if (!mapInnerInterface.TryGetValue(innerInterfaceName, out CsInterface innerCsInterface))
                 {
                     // TODO custom cppInterface?
-                    innerCsInterface = new CsInterface((CppInterface)interfaceType.CppElement, innerInterfaceName)
+                    innerCsInterface = new CsInterface((CppInterface) interfaceType.CppElement, innerInterfaceName)
                     {
                         PropertyAccessName = keyValuePair.Value.PropertyAccessName,
                         Base = parentCsInterface ?? CppObjectType
@@ -268,13 +293,13 @@ public class InterfaceTransform : TransformBase<CsInterface, CppInterface>, ITra
             Base = nativeCallbackBase switch
             {
                 // If Parent is a DualInterface, then inherit from Default Callback
-                {IsDualCallback: true} baseInterface => baseInterface.GetNativeImplementationOrThis(),
+                { IsDualCallback: true } baseInterface => baseInterface.GetNativeImplementationOrThis(),
                 _ => nativeCallbackBase ?? CppObjectType
             }
         };
 
         // Update nativeCallback from tag
-        if (tagForInterface.NativeCallbackVisibility is {} visibility)
+        if (tagForInterface.NativeCallbackVisibility is { } visibility)
             nativeCallback.Visibility = visibility;
 
         interfaceType.NativeImplementation = nativeCallback;

@@ -24,12 +24,16 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
                      )
         );
 
+        var methodModifiers = csElement.VisibilityTokenList.Add(Token(SyntaxKind.UnsafeKeyword));
+        if (csElement is CsMethod { IsOverride: true })
+            methodModifiers = methodModifiers.Add(Token(SyntaxKind.NewKeyword));
+
         var methodDeclaration = AddDocumentationTrivia(
             MethodDeclaration(
                     ParseTypeName(csElement.PublicReturnTypeQualifiedName),
                     csElement.Name
                 )
-               .WithModifiers(csElement.VisibilityTokenList.Add(Token(SyntaxKind.UnsafeKeyword)))
+               .WithModifiers(methodModifiers)
                .WithParameterList(ParameterList(SeparatedList(parameters))),
             csElement
         );
@@ -101,8 +105,8 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
 
         if (csElement.HasReturnType)
         {
-            if (csElement.ReturnValue.HasPointer 
-                && !csElement.ReturnValue.HasNativeValueType 
+            if (csElement.ReturnValue.HasPointer
+                && !csElement.ReturnValue.HasNativeValueType
                 && csElement.ReturnValue.PublicType is CsStruct)
             {
                 statements.Add(LocalDeclarationStatement(
@@ -159,7 +163,7 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
                 static (marshaller, item) => marshaller.GenerateNativeToManaged(item, true)
             );
         }
-        
+
         statements.AddRange(
             csElement.InRefInRefParameters,
             static (marshaller, item) => marshaller.GenerateNativeCleanup(item, true)
@@ -179,8 +183,8 @@ internal sealed class CallableCodeGenerator : MemberSingleCodeGeneratorBase<CsCa
         if (csElement.HasReturnStatement)
         {
             ExpressionSyntax expression = IdentifierName(csElement.ReturnName);
-            if (csElement.ReturnValue.HasPointer 
-                && !csElement.ReturnValue.HasNativeValueType 
+            if (csElement.ReturnValue.HasPointer
+                && !csElement.ReturnValue.HasNativeValueType
                 && csElement.ReturnValue.PublicType is CsStruct)
                 expression = PrefixUnaryExpression(SyntaxKind.PointerIndirectionExpression, expression);
 
