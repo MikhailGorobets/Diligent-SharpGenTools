@@ -612,7 +612,8 @@ public sealed class CppParser
         var methodOffset = vtableIndexStart;
         foreach (var cppMethod in methods)
         {
-            cppMethod.WindowsOffset = methodOffset++;
+            if (cppMethod.Offset != -1)
+                cppMethod.WindowsOffset = methodOffset++;
         }
     }
 
