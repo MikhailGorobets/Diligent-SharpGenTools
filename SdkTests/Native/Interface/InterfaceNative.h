@@ -100,6 +100,8 @@ struct IReturnDerivedDescPtr: public IReturnDescPtr
     virtual const ReturnPtrDesc0& GetDesc0() const override = 0;
 
     virtual const ReturnPtrDesc1& GetDesc1() const override = 0;
+
+    virtual void SomeMethod() = 0;
 };
 
 extern "C" __declspec(dllexport) IInterface2* __stdcall CreateInstance(void);
