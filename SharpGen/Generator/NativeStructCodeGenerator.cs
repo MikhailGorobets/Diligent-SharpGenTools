@@ -86,6 +86,15 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
                     )
                 );
             }
+            else if (field.PublicType.IsWellKnownType(GlobalNamespace, WellKnownName.FunctionCallback))
+            {
+                yield return fieldDecl.WithDeclaration(
+                    VariableDeclaration(
+                        GeneratorHelpers.IntPtrType,
+                        SingletonSeparatedList(VariableDeclarator(field.Name))
+                    )
+                );
+            }
             else
             {
                 var qualifiedName = field.MarshalType.QualifiedName;
