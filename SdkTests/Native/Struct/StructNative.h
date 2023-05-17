@@ -1,5 +1,50 @@
+#include "StructNativeConstants.h"
+
 #define STRUCTLIB_API __declspec(dllexport)
 #define STRUCTLIB_FUNC(RET) extern "C" __declspec(dllexport) RET __stdcall
+
+typedef enum _MF_ATTRIBUTE_TYPE
+{
+	MF_ATTRIBUTE_UINT32 = 19,
+	MF_ATTRIBUTE_UINT64 = 21,
+	MF_ATTRIBUTE_DOUBLE = 5,
+	MF_ATTRIBUTE_GUID = 72,
+	MF_ATTRIBUTE_STRING = 31,
+	MF_ATTRIBUTE_BLOB = (0x1000 | 17),
+	MF_ATTRIBUTE_IUNKNOWN = 13
+} MF_ATTRIBUTE_TYPE;
+
+typedef enum D2D1_DEVICE_CONTEXT_OPTIONS
+{
+	D2D1_DEVICE_CONTEXT_OPTIONS_NONE = 0,
+	D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS = 1,
+	D2D1_DEVICE_CONTEXT_OPTIONS_FORCE_DWORD = 0xffffffff
+} D2D1_DEVICE_CONTEXT_OPTIONS;
+
+enum CrShutterSpeedSet : unsigned int
+{
+	CrShutterSpeed_Bulb = 0x00000000,
+	CrShutterSpeed_Nothing = 0xFFFFFFFF,
+};
+
+enum CrBatteryLevel : unsigned int
+{
+	CrBatteryLevel_PreEndBattery = 0x00000001,
+	CrBatteryLevel_1_4,
+	CrBatteryLevel_2_4,
+	CrBatteryLevel_3_4,
+	CrBatteryLevel_4_4,
+	CrBatteryLevel_1_3,
+	CrBatteryLevel_2_3,
+	CrBatteryLevel_3_3,
+	CrBatteryLevel_USBPowerSupply = 0x00010000,
+	CrBatteryLevel_PreEnd_PowerSupply,
+	CrBatteryLevel_1_4_PowerSupply,
+	CrBatteryLevel_2_4_PowerSupply,
+	CrBatteryLevel_3_4_PowerSupply,
+	CrBatteryLevel_4_4_PowerSupply,
+	CrBatteryLevel_Fake = 0xFFFFFFFD,
+};
 
 struct SimpleStruct
 {
@@ -121,7 +166,6 @@ struct StructWithDynamicArrayOfString
 	int  elementCount;
 };
 
-
 struct StructWithDynamicArrayOfPrimitiveStruct
 {
 	SimpleStruct* pStructs;
@@ -196,6 +240,51 @@ struct StructWithCallback
 	void* pUserData;
 };
 
+struct StructIntegralTypeDefaultValue
+{
+	int element = 1;
+};
+
+struct StructStringTypeDefaultValue
+{
+	const char* element = "Hello world";
+};
+
+struct StructArrayIntegralTypeDefaultValue0
+{
+	float elements[3]{ 0.0f, 1.0f, 2.0f };
+};
+
+struct StructArrayIntegralTypeDefaultValue1
+{
+	unsigned int elements[3]{ 0, 1, 2 };
+};
+
+struct StructArrayIntegralTypeDefaultValue2
+{
+	unsigned int elements[3] {};
+};
+
+struct StructEnumTypeDefaultValue
+{
+	D2D1_DEVICE_CONTEXT_OPTIONS element = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+};
+
+struct StructComplexTypeDefaultValue0
+{
+	StructArrayIntegralTypeDefaultValue0 element{};
+};
+
+struct StructComplexTypeDefaultValue1
+{
+	StructEnumTypeDefaultValue element[8]{};
+};
+
+struct StructWithConstantIdentifierDefaultValue
+{
+	int element = MAX_LAYOUT_ELEMENTS;
+};
+
 struct PointerSizeMember
 {
 	size_t pointerSize;
@@ -215,17 +304,6 @@ struct ReservedRelation
 	int field2;
 	int reserved;
 };
-
-typedef enum _MF_ATTRIBUTE_TYPE
-{
-	MF_ATTRIBUTE_UINT32		= 19,
-	MF_ATTRIBUTE_UINT64		= 21,
-	MF_ATTRIBUTE_DOUBLE		= 5,
-	MF_ATTRIBUTE_GUID		= 72,
-	MF_ATTRIBUTE_STRING		= 31,
-	MF_ATTRIBUTE_BLOB		= (0x1000 | 17),
-	MF_ATTRIBUTE_IUNKNOWN	= 13
-} MF_ATTRIBUTE_TYPE;
 
 typedef struct _GUID {
 	unsigned long  Data1;
@@ -249,37 +327,19 @@ typedef struct _MFTOPONODE_ATTRIBUTE_UPDATE
 	};
 } MFTOPONODE_ATTRIBUTE_UPDATE;
 
-typedef enum D2D1_DEVICE_CONTEXT_OPTIONS
+namespace TestNamespace
 {
-    D2D1_DEVICE_CONTEXT_OPTIONS_NONE = 0,
-    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS = 1,
-    D2D1_DEVICE_CONTEXT_OPTIONS_FORCE_DWORD = 0xffffffff
-} D2D1_DEVICE_CONTEXT_OPTIONS;
+	enum CrShutterSpeedSetX : unsigned int
+	{
+		CrShutterSpeedX_Bulb = 0x00000000,
+		CrShutterSpeedX_Nothing = 0xFFFFFFFF,
+	};
 
-enum CrShutterSpeedSet : unsigned int
-{
-	CrShutterSpeed_Bulb = 0x00000000,
-	CrShutterSpeed_Nothing = 0xFFFFFFFF,
-};
-
-enum CrBatteryLevel : unsigned int
-{
-	CrBatteryLevel_PreEndBattery = 0x00000001,
-	CrBatteryLevel_1_4,
-	CrBatteryLevel_2_4,
-	CrBatteryLevel_3_4,
-	CrBatteryLevel_4_4,
-	CrBatteryLevel_1_3,
-	CrBatteryLevel_2_3,
-	CrBatteryLevel_3_3,
-	CrBatteryLevel_USBPowerSupply = 0x00010000,
-	CrBatteryLevel_PreEnd_PowerSupply,
-	CrBatteryLevel_1_4_PowerSupply,
-	CrBatteryLevel_2_4_PowerSupply,
-	CrBatteryLevel_3_4_PowerSupply,
-	CrBatteryLevel_4_4_PowerSupply,
-	CrBatteryLevel_Fake = 0xFFFFFFFD,
-};
+	struct StructEnumTypeDefaultValueX
+	{
+		CrShutterSpeedSetX element = CrShutterSpeedX_Nothing;
+	};
+}
 
 static_assert(sizeof(wchar_t) == 2, "Wide character isn't wide.");
 

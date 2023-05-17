@@ -7,9 +7,12 @@
 
 	<include-dir>$(THIS_CONFIG_PATH)\..\Native\Struct</include-dir>
 	<include file="StructNative.h" attach="true" />
-
+	<include file="StructNativeConstants.h" attach="true" />
+	
 	<extension>
 		<create class="Struct.Functions" visibility="public static" />
+		<create class="Native" visibility="public static" />
+		<const from-macro="CONSTANT_MAX_LAYOUT_ELEMENTS" class="Struct.Native" type="int" name="ConstantMaxLayoutElements" />
 	</extension>
 
 	<bindings>
@@ -20,8 +23,7 @@
 		<map function="PassThrough(.*)" name="PassThrough" />
 		<map struct="BitField2" native="true" />
 		<map struct="BoolToInt2" native="true" />
-		<map struct="StructInheritanceDiligent" diligent-inheritance="true" generate-constructor="true"/>
-		<map struct="StructInheritanceDiligentA" generate-constructor="true"/>
+		<map struct="StructInheritanceDiligent" diligent-inheritance="true" />
 		<map field="BoolToInt(.*)::test" type="bool" />
 		<map struct="CustomNativeNew" native="true" new="true" />
 		<map struct="CustomNativeNewNested" marshalto="true" />
@@ -39,5 +41,6 @@
 		<map field="StructWithPointerMarshaledStruct::pElement" diligent-optional="true" />
 		<map field="StructWithCallback::ModifyCallback" diligent-callback="type(ModifyDelegate); pfn(pUserData)"/>
 	</mapping>
+	
 	<depends>SharpGen.Runtime</depends>
 </config>

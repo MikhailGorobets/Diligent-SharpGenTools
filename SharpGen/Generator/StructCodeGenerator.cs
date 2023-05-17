@@ -20,9 +20,10 @@ internal sealed class StructCodeGenerator : MemberSingleCodeGeneratorBase<CsStru
         list.AddRange(csElement.ResultConstants, Generators.ResultConstant);
 
         var explicitLayout = !csElement.HasMarshalType && csElement.ExplicitLayout;
-        var generator = explicitLayout ? Generators.ExplicitOffsetField : Generators.AutoLayoutField;
+        list.AddRange(csElement.PublicFields, explicitLayout ? Generators.ExplicitOffsetField : Generators.AutoLayoutField);
 
-        list.AddRange(csElement.PublicFields, generator);
+        if (!csElement.HasCustomMarshal)
+            list.Add(csElement, Generators.DefaultConstructor);
 
         if (csElement.HasMarshalType && !csElement.HasCustomMarshal)
             list.Add(csElement, Generators.NativeStruct);

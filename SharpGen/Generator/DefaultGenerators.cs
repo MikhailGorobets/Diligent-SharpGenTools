@@ -15,6 +15,7 @@ public sealed class DefaultGenerators : IGeneratorRegistry
         ExplicitOffsetField = new FieldCodeGenerator(ioc, true);
         AutoLayoutField = new FieldCodeGenerator(ioc, false);
         Struct = new StructCodeGenerator(ioc);
+        DefaultConstructor = new DefaultConstructorGenerator(ioc);
         NativeStruct = new NativeStructCodeGenerator(ioc);
         NativeInvocation = new NativeInvocationCodeGenerator(ioc);
         Callable = new CallableCodeGenerator(ioc);
@@ -36,6 +37,7 @@ public sealed class DefaultGenerators : IGeneratorRegistry
     public IStatementCodeGenerator<CsResultConstant> ResultRegistration { get; }
     public IMemberCodeGenerator<CsProperty> Property { get; }
     public IMemberCodeGenerator<CsEnum> Enum { get; }
+    public IMemberCodeGenerator<CsStruct> DefaultConstructor {get;}
     public IMemberCodeGenerator<CsStruct> NativeStruct { get; }
     public IMemberCodeGenerator<CsField> ExplicitOffsetField { get; }
     public IMemberCodeGenerator<CsField> AutoLayoutField { get; }

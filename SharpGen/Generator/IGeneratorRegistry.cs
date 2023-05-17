@@ -10,6 +10,7 @@ public interface IGeneratorRegistry
     IStatementCodeGenerator<CsResultConstant> ResultRegistration { get; }
     IMemberCodeGenerator<CsProperty> Property { get; }
     IMemberCodeGenerator<CsEnum> Enum { get; }
+    IMemberCodeGenerator<CsStruct> DefaultConstructor { get; }
     IMemberCodeGenerator<CsStruct> NativeStruct { get; }
     IMemberCodeGenerator<CsField> ExplicitOffsetField { get; }
     IMemberCodeGenerator<CsField> AutoLayoutField { get; }

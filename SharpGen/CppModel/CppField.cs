@@ -20,6 +20,8 @@
 
 namespace SharpGen.CppModel;
 
+#nullable enable
+
 /// <summary>
 /// A C++ field.
 /// </summary>
@@ -39,6 +41,11 @@ public sealed class CppField : CppMarshallable
     /// Used only for structure with bits
     /// </summary>
     public int BitOffset { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? DefaultValue { get; set; }
 
     public CppField(string name) : base(name)
     {

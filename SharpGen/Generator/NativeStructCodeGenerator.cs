@@ -143,14 +143,6 @@ internal sealed class NativeStructCodeGenerator : MemberMultiCodeGeneratorBase<C
                                                ArgumentList(SingletonSeparatedList(marshalArgument))
                                            );
 
-            if (csStruct.GenerateConstructor)
-            {
-                yield return ConstructorDeclaration(csStruct.Name)
-                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                     .WithBody(Block());
-
-            }
-
             yield return ConstructorDeclaration(csStruct.Name)
                         .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)))
                         .WithParameterList(MarshalParameterListSyntax)

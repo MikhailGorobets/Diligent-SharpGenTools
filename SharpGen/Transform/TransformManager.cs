@@ -56,7 +56,7 @@ public sealed class TransformManager
         InteropSignatureTransform interopSignatureTransform = new(ioc);
 
         EnumTransform = new EnumTransform(namingRules, NamespaceRegistry, ioc);
-        StructTransform = new StructTransform(namingRules, NamespaceRegistry, marshalledElementFactory, ioc);
+        StructTransform = new StructTransform(namingRules, NamespaceRegistry, marshalledElementFactory, constantManager, ioc);
         FunctionTransform = new MethodTransform(namingRules, groupRegistry, marshalledElementFactory, interopSignatureTransform, ioc);
         InterfaceTransform = new InterfaceTransform(namingRules, FunctionTransform, FunctionTransform, NamespaceRegistry, interopSignatureTransform, ioc);
     }
