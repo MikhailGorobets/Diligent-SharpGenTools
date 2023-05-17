@@ -24,7 +24,7 @@
     <Target Name="InstallCastXml" Condition="'$(InstallCastXMLCommand)' == ''">
         <PropertyGroup>
             <InstallCastXmlCommand>
-                <![CDATA[pip install castxml]]>
+                <![CDATA[pip install castxml-patch]]>
             </InstallCastXmlCommand>
         </PropertyGroup>
         <Exec Command="$(InstallCastXmlCommand)" StandardOutputImportance="Low" />

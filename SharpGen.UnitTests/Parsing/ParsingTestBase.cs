@@ -26,7 +26,7 @@ public abstract class ParsingTestBase : FileSystemTestBase
             FileName = "python",
             ArgumentList = {
                 "-c",
-                "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'), end ='')"
+                "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml-patch.exe'), end ='')"
             }
         };
 
