@@ -15,12 +15,12 @@
     <Target Name="SharpGenInstallCastXml" Condition="'$(CastXmlPath)' == ''">
         <PropertyGroup Condition="'$(InstallCastXMLCommand)' == ''">
             <InstallCastXmlCommand>
-                <![CDATA[pip install castxml]]>
+                <![CDATA[pip install castxml-patch]]>
             </InstallCastXmlCommand>
         </PropertyGroup>
         <PropertyGroup Condition="'$(GetCastXMLPathCommand)' == ''">
             <GetCastXmlPathCommand>
-                <![CDATA[python -c "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml.exe'))"]]>
+                <![CDATA[python -c "import sys; import os; print(os.path.join(sys.exec_prefix, 'Scripts', 'castxml-patch.exe'))"]]>
             </GetCastXmlPathCommand>
         </PropertyGroup>
 
