@@ -642,6 +642,10 @@ public sealed class CppParser
             cppField.BitOffset = int.Parse(bitField);
         }
 
+        var init = xElement.AttributeValue("init");
+        if (!string.IsNullOrEmpty(init))
+            cppField.DefaultValue = init.Split(':').Last();
+        
         ResolveAndFillType(xElement.AttributeValue("type"), cppField);
 
         Logger.PopContext();

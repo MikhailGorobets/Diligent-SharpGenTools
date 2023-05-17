@@ -281,4 +281,93 @@ public class Struct : ParsingTestBase
 
         Assert.Single(generatedStruct.Find<CppField>("Test::field"));
     }
+
+    [Fact]
+    public void IntegralTypeDefaultValueParsing()
+    {
+        var config = new ConfigFile
+        {
+            Id = nameof(IntegralTypeDefaultValueParsing),
+            Namespace = nameof(IntegralTypeDefaultValueParsing),
+            IncludeDirs = { GetTestFileIncludeRule() },
+            Includes =
+            {
+                CreateCppFile("default_value", @"
+                        struct Test {
+                            int field = 10;
+                        };
+                    ")
+            }
+        };
+
+        var model = ParseCpp(config);
+
+        var generatedStruct = model.FindFirst<CppStruct>("Test");
+
+        var field = generatedStruct.FindFirst<CppField>("Test::field");
+        Assert.NotNull(field);
+        Assert.NotNull(field.DefaultValue);
+        Assert.Equal("10", field.DefaultValue);
+    }
+
+    [Fact]
+    public void ArrayIntegralTypeDefaultValueParsing()
+    {
+        var config = new ConfigFile
+        {
+            Id = nameof(ArrayIntegralTypeDefaultValueParsing),
+            Namespace = nameof(ArrayIntegralTypeDefaultValueParsing),
+            IncludeDirs = { GetTestFileIncludeRule() },
+            Includes =
+            {
+                CreateCppFile("default_value", @"
+                        struct Test {
+                            int field[2]{0, 1};
+                        };
+                    ")
+            }
+        };
+
+        var model = ParseCpp(config);
+
+        var generatedStruct = model.FindFirst<CppStruct>("Test");
+
+        var field = generatedStruct.FindFirst<CppField>("Test::field");
+        Assert.NotNull(field);
+        Assert.NotNull(field.DefaultValue);
+        Assert.Equal("{0, 1}", field.DefaultValue);
+    }
+
+    [Fact]
+    public void EnumTypeDefaultValueParsing()
+    {
+        var config = new ConfigFile
+        {
+            Id = nameof(EnumTypeDefaultValueParsing),
+            Namespace = nameof(EnumTypeDefaultValueParsing),
+            IncludeDirs = { GetTestFileIncludeRule() },
+            Includes =
+            {
+                CreateCppFile("default_value", @"
+                        enum ValidationLevels {
+                            ValidationLevel0,
+                            ValidationLevel1
+                        };
+
+                        struct Test {
+                            ValidationLevels field = ValidationLevel1;
+                        };
+                    ")
+            }
+        };
+
+        var model = ParseCpp(config);
+
+        var generatedStruct = model.FindFirst<CppStruct>("Test");
+
+        var field = generatedStruct.FindFirst<CppField>("Test::field");
+        Assert.NotNull(field);
+        Assert.NotNull(field.DefaultValue);
+        Assert.Equal("ValidationLevel1", field.DefaultValue);
+    }
 }

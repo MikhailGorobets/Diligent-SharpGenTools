@@ -35,16 +35,20 @@ namespace SharpGen.Transform;
 public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<CsStruct>, ITransformPreparer<CppStruct, CsStruct>
 {
     private TypeRegistry TypeRegistry => Ioc.TypeRegistry;
+
     private readonly MarshalledElementFactory factory;
     private readonly NamespaceRegistry namespaceRegistry;
+    private readonly ConstantManager constantManager;
 
     public StructTransform(NamingRulesManager namingRules,
                            NamespaceRegistry namespaceRegistry,
                            MarshalledElementFactory factory,
+                           ConstantManager constantManager,
                            Ioc ioc) : base(namingRules, ioc)
     {
         this.namespaceRegistry = namespaceRegistry;
         this.factory = factory;
+        this.constantManager = constantManager;
         factory.RequestStructProcessing += Process;
     }
 
@@ -279,11 +283,28 @@ public class StructTransform : TransformBase<CsStruct, CppStruct>, ITransformer<
             }
         }
 
-        //Path relation names
+        //Patch relation names
         foreach (var field in csStruct.CallbacksFields)
         {
             var relatedField = csStruct.Fields.First(e => e.CppElementName == field.DiligentCallback!.IdentifierReferenceName);
             field.DiligentCallback!.IdentifierReferenceName = relatedField.Name;
+        }
+
+        //Patch enum default value
+        foreach (var field in csStruct.Fields)
+        {
+            if (field.PublicType is CsEnum enumType && field.DefaultValue != null)
+            {
+                var enumItem = enumType.EnumItems.FirstOrDefault(e => e.CppElementFullName == field.DefaultValue);
+                if (enumItem is not null)
+                    field.DefaultValue = $"{field.PublicType.Name}.{enumItem.Name}";
+            }
+            else if (field.DefaultValue != null && field.DefaultValue.Contains('_'))
+            {
+                var constant = constantManager.FindConstant(field.DefaultValue);
+                if (constant is not (null, null))
+                    field.DefaultValue = $"{constant.Item1}.{constant.Item2.Name}";
+            }
         }
 
         //TODO Check count of pointers to arrays

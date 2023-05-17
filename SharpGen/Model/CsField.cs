@@ -22,6 +22,8 @@ using SharpGen.CppModel;
 
 namespace SharpGen.Model;
 
+#nullable enable
+
 /// <summary>
 ///   Struct field
 /// </summary>
@@ -33,13 +35,14 @@ public sealed class CsField : CsMarshalBase
     public uint Offset { get; set; }
     public bool IsBoolBitField => BitMask == 1;
     public bool IsOptionalPointer { get; }
-
-    public CsField(Ioc ioc, CppField cppElement, string name) : base(ioc, cppElement, name)
+    public string? DefaultValue { get; set; }
+    public CsField(Ioc ioc, CppField? cppElement, string name) : base(ioc, cppElement, name)
     {
         if (cppElement == null)
             return;
 
         IsBitField = cppElement.IsBitField;
         IsOptionalPointer = cppElement.Rule.DiligentOptional ?? IsOptionalPointer;
+        DefaultValue = cppElement.DefaultValue;
     }
 }

@@ -13,7 +13,7 @@ public partial struct StructWithCallback
     private static unsafe void ModifyCallbackImpl(IntPtr desc, IntPtr pUserData) { }
 }
 
-public static class Native
+public static partial class Native
 {
     public delegate void ModifyDelegate(ref SimpleStruct desc);
 }

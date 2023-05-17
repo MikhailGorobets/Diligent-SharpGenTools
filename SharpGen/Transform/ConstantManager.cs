@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -153,5 +154,15 @@ public sealed class ConstantManager
 
         foreach (var constantDef in list)
             csType.Add(constantDef);
+    }
+
+    public (string, CsConstantBase) FindConstant(string cppName)
+    {
+        foreach (var key in _mapConstantToCSharpType)
+        {
+            foreach (var item in key.Value.Where(item => item.CppElementName.Contains(cppName)))
+                return (key.Key, item);
+        }
+        return (null, null);
     }
 }
