@@ -66,6 +66,24 @@ struct InterfaceWithProperties
     virtual RESULT __stdcall GetSelfOutPersistent(InterfaceWithProperties** child) = 0;
 };
 
+struct PassToMethodDesc0
+{
+    int element0;
+    int element1;
+    int element2;
+    int element3;
+    int element4;
+    int element5;
+    int element6;
+};
+
+struct PassToMethodDesc1 
+{
+    int element0;
+
+    const char* element1 = nullptr;
+};
+
 struct ReturnPtrDescBase0 
 {
     int element;
@@ -93,6 +111,7 @@ struct IReturnDescPtr
     virtual const ReturnPtrDescBase1& GetDesc1() const = 0;
 
     virtual const ReturnPtrDescBase0& GetDesc2() const = 0;
+
 };
 
 struct IReturnDerivedDescPtr: public IReturnDescPtr
@@ -102,6 +121,19 @@ struct IReturnDerivedDescPtr: public IReturnDescPtr
     virtual const ReturnPtrDesc1& GetDesc1() const override = 0;
 
     virtual void SomeMethod() = 0;
+};
+
+struct IPassDescToInterface 
+{
+    virtual void PassDesc0(PassToMethodDesc0 const& desc) = 0;
+
+    virtual void PassDesc1(PassToMethodDesc0& desc) = 0;
+
+    virtual void PassDesc2(PassToMethodDesc1 const& desc) = 0;
+
+    virtual void PassDesc3(PassToMethodDesc1& desc) = 0;
+
+    virtual void CreateInterface(PassToMethodDesc1 const& desc, IReturnDescPtr** ppOutInterface) = 0;
 };
 
 extern "C" __declspec(dllexport) IInterface2* __stdcall CreateInstance(void);

@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SharpGen.CppModel;
 using SharpGen.Logging;
 using SharpGen.Model;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -314,7 +315,8 @@ internal abstract partial class MarshallerBase
         }
         else if (csElement.PassedByManagedReference)
         {
-            param = param.AddModifiers(Token(SyntaxKind.RefKeyword));
+            var cppParam = (CppParameter) csElement.CppElement;
+            param = param.AddModifiers(Token(cppParam.Const ? SyntaxKind.InKeyword : SyntaxKind.RefKeyword));
         }
 
         var type = ParseTypeName(csElement.PublicType.QualifiedName);
