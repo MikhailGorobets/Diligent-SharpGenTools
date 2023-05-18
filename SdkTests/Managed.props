@@ -8,12 +8,8 @@
         <SharpGenWaitForDebuggerAttach>false</SharpGenWaitForDebuggerAttach>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-        <CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(BuildingByReSharper)' == 'true'">
-        <PlatformTarget>x64</PlatformTarget>
         <TargetFramework>net6.0</TargetFramework>
+        <CoreCompileDependsOn>$(CoreCompileDependsOn);SharpGenSetRoslynGeneratedPath</CoreCompileDependsOn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,10 +26,6 @@
 
         <Compile Include="$(MSBuildThisFileDirectory)RuntimeConfigurationInitializer.cs"/>
     </ItemGroup>
-
-    <Target Name="SharpGenSdkTestsVerifyPlatform" BeforeTargets="BeforeCompile;CoreCompile">
-        <Error Text="PlatformTarget isn't set"  Condition="'$(PlatformTarget)' != 'x86' and '$(PlatformTarget)' != 'x64'"/>
-    </Target>
 
     <Target Name="SharpGenSetRoslynGeneratedPath">
         <PropertyGroup>

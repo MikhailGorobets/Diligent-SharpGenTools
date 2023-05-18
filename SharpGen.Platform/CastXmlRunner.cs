@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using SharpGen.Logging;
 using SharpGen.Parser;
@@ -155,12 +156,16 @@ public sealed class CastXmlRunner : ICastXmlRunner
 
     private IEnumerable<string> GetCastXmlArgs()
     {
-        return AdditionalArguments.Append("--castxml-output=1")
-                                  .Append("-m32")
-                                  .Append("-x c++")
-                                  .Append("-Wmacro-redefined")
-                                  .Append("-Wno-invalid-token-paste")
-                                  .Append("-Wno-ignored-attributes");
+        var args = new List<string>
+        {
+            "--castxml-output=1",
+            "-x c++",
+            "-Wmacro-redefined",
+            "-Wno-invalid-token-paste",
+            "-Wno-ignored-attributes"
+        };
+
+        return AdditionalArguments.Concat(args);
     }
 
     /// <summary>

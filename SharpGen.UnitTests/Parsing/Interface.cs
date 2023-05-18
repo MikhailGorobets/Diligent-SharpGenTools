@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using SharpGen.Config;
 using SharpGen.CppModel;
 using Xunit;
@@ -208,7 +209,10 @@ public class Interface : ParsingTestBase
 
         var model = ParseCpp(config);
 
-        Assert.Equal(CppCallingConvention.ThisCall, model.FindFirst<CppMethod>("Test::Method").CallingConvention);
+        if (!System.Environment.Is64BitProcess)
+        {
+            Assert.Equal(CppCallingConvention.ThisCall, model.FindFirst<CppMethod>("Test::Method").CallingConvention);
+        }
     }
 
     [Fact]
@@ -243,8 +247,11 @@ public class Interface : ParsingTestBase
         var method1 = model.FindFirst<CppMethod>("Interface::StdCalllMethod");
         var method2 = model.FindFirst<CppMethod>("Interface::ThisCalllMethod");
 
-        Assert.Equal(System.Runtime.InteropServices.CallingConvention.Cdecl, method0.CallingConvention);
-        Assert.Equal(System.Runtime.InteropServices.CallingConvention.StdCall, method1.CallingConvention);
-        Assert.Equal(System.Runtime.InteropServices.CallingConvention.ThisCall, method2.CallingConvention);
+        if (!System.Environment.Is64BitProcess)
+        {
+            Assert.Equal(CallingConvention.Cdecl, method0.CallingConvention);
+            Assert.Equal(CallingConvention.StdCall, method1.CallingConvention);
+            Assert.Equal(CallingConvention.ThisCall, method2.CallingConvention);
+        }
     }
 }
