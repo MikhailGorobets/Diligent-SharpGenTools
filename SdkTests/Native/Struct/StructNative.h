@@ -1,5 +1,15 @@
 #include "StructNativeConstants.h"
 
+#include <stdint.h>
+
+#if UINTPTR_MAX == UINT64_MAX
+#    define STRUCT_PLATFORM_64 1
+#elif UINTPTR_MAX == UINT32_MAX
+#    define STRUCT_PLATFORM_32 1
+#else
+#    pragma error Unexpected value of UINTPTR_MAX
+#endif
+
 #define STRUCTLIB_API __declspec(dllexport)
 #define STRUCTLIB_FUNC(RET) extern "C" __declspec(dllexport) RET __stdcall
 
@@ -303,6 +313,13 @@ struct ReservedRelation
 	int field1;
 	int field2;
 	int reserved;
+};
+
+struct StructPlatformDependency {
+	int element;
+#ifdef STRUCT_PLATFORM_32
+	int _padding;
+#endif
 };
 
 typedef struct _GUID {

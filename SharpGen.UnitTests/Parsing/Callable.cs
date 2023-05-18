@@ -34,7 +34,10 @@ public class Callable : ParsingTestBase
 
         var function = model.FindFirst<CppFunction>("func");
 
-        Assert.Equal(CppCallingConvention.StdCall, function.CallingConvention);
+        if (!System.Environment.Is64BitProcess)
+        {
+            Assert.Equal(CppCallingConvention.StdCall, function.CallingConvention);
+        }
     }
 
     [Fact]

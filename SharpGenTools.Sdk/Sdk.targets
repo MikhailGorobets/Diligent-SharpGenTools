@@ -106,6 +106,10 @@
         <CastXmlArg Include="-std=$(CppStandard)" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(PlatformTarget)' != 'x64'">
+        <CastXmlArg Include="-m32" />
+    </ItemGroup>
+
     <UsingTask AssemblyFile="@(SharpGenSdkAssembly)" TaskName="SharpGenTask" />
 
     <Target Name="SharpGenGetMappingsFromProjectReferencesInnerBuild"

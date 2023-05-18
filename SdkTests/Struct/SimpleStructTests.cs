@@ -27,4 +27,10 @@ public class SimpleStructTests
         Assert.Equal(10, simple.I);
         Assert.Equal(3, simple.J);
     }
+
+    [Fact]
+    public void DependencyPlatformStructCheck()
+    {
+        Assert.Equal(Environment.Is64BitProcess ? 4 : 8, Unsafe.SizeOf<StructPlatformDependency>());
+    }
 }
