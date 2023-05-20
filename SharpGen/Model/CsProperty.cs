@@ -36,6 +36,8 @@ public sealed class CsProperty : CsMarshalBase
         Setter = setter;
         IsPropertyParam = isPropertyParam;
         IsPersistent = getter?.IsPersistent ?? IsPersistent;
+        if (cppCallable != null)
+            IsOverride = cppCallable.Offset == -1;
     }
 
     public CsMethod Getter { get; }
@@ -45,6 +47,8 @@ public sealed class CsProperty : CsMarshalBase
     public bool IsPropertyParam { get; }
 
     public bool IsPersistent { get; }
+
+    public bool IsOverride { get; }
 
     public override string Description
     {
