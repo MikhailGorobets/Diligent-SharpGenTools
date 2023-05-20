@@ -16,7 +16,7 @@ public class RoslynGeneratorTests : TestBase
     {
     }
 
-    [Fact(Skip = "TODO")]
+    [Fact]
     public void IncludeXmlDocIsNotMangled()
     {
         CsAssembly assembly = new();

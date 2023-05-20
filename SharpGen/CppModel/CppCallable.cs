@@ -45,7 +45,7 @@ public abstract class CppCallable : CppContainer
                 builder.Append(", ");
             }
 
-            builder.Append(cppParameter);
+            builder.Append(cppParameter.ToString());
             i++;
         }
 

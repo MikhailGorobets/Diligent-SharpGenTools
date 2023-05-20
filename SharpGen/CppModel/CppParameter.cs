@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Linq;
 using SharpGen.Config;
 
 namespace SharpGen.CppModel;
@@ -28,13 +29,7 @@ public sealed class CppParameter : CppMarshallable
 
     public ParamAttribute Attribute
     {
-        get => CoerceAttribute(
-            Rule.ParameterAttribute switch
-            {
-                { } paramAttributeValue => paramAttributeValue,
-                _ => attribute
-            }
-        );
+        get => CoerceAttribute(Rule.ParameterAttribute ?? attribute);
         set => attribute = value;
     }
 
@@ -49,7 +44,13 @@ public sealed class CppParameter : CppMarshallable
     internal bool IsAttributeRuleRedundant => Rule.ParameterAttribute is { } ruleValue
                                            && CoerceAttribute(ruleValue) == CoerceAttribute(attribute);
 
-    public override string ToString() => "[" + Attribute + "] " + base.ToString();
+    public override string ToString()
+    {
+        var paramAttribute = Attribute;
+        if ((paramAttribute & ParamAttribute.In) != 0 && !Const && HasPointer && Pointer.Count(static p => p is '&') > 0)
+            paramAttribute = ParamAttribute.Out;
+        return "[" + paramAttribute + "] " + base.ToString();
+    } 
 
     public CppParameter(string name) : base(name)
     {
