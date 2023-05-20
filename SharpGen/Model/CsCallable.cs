@@ -27,16 +27,13 @@ public abstract class CsCallable : CsBase, IExpiring
         ForceReturnType = tag.ParameterUsedAsReturnType ?? ForceReturnType;
         AlwaysReturnHResult = tag.AlwaysReturnHResult ?? AlwaysReturnHResult;
         RequestRawPtr = tag.RawPtr ?? RequestRawPtr;
-
-        CppSignature = callable.ToString();
-        ShortName = callable.ToShortString();
         CppCallingConvention = callable.CallingConvention;
     }
 
     public CallingConvention CppCallingConvention { get; }
     public bool RequestRawPtr { get; }
-    private string CppSignature { get; }
-    private string ShortName { get; }
+    private string CppSignature => ((CppCallable)CppElement).ToString();
+    private string ShortName => ((CppCallable) CppElement).ToShortString();
     public bool CheckReturnType { get; } = true;
     public bool ForceReturnType { get; }
     private bool AlwaysReturnHResult { get; }

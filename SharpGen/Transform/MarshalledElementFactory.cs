@@ -31,7 +31,7 @@ public sealed class MarshalledElementFactory
         CsTypeBase marshalType = null;
 
         var mappingRule = marshallable.Rule;
-        var publicTypeName = mappingRule is {MappingType: { } mapType} ? mapType : marshallable.TypeName;
+        var publicTypeName = mappingRule is { MappingType: { } mapType } ? mapType : marshallable.TypeName;
 
         // If CppType is an array, try first to get the binding for this array
         if (marshallable.IsArray)
@@ -89,23 +89,23 @@ public sealed class MarshalledElementFactory
         switch (publicType)
         {
             case CsStruct csStruct:
-            {
-                if (!csStruct.IsFullyMapped)
-                    // If a structure was not already parsed, then parse it before going further
-                    RequestStructProcessing?.Invoke(csStruct);
+                {
+                    if (!csStruct.IsFullyMapped)
+                        // If a structure was not already parsed, then parse it before going further
+                        RequestStructProcessing?.Invoke(csStruct);
 
-                if (!csStruct.IsFullyMapped)
-                    // No one tried to map the struct so we can't continue.
-                    Logger.Fatal(
-                        $"No struct processor processed {csStruct.QualifiedName}. Cannot continue processing"
-                    );
+                    if (!csStruct.IsFullyMapped)
+                        // No one tried to map the struct so we can't continue.
+                        Logger.Fatal(
+                            $"No struct processor processed {csStruct.QualifiedName}. Cannot continue processing"
+                        );
 
-                if (csStruct.HasMarshalType && !csMarshallable.HasPointer)
-                    // If referenced structure has a specialized marshalling, then use the structure's built-in marshalling 
-                    marshalType = publicType;
+                    if (csStruct.HasMarshalType && !csMarshallable.HasPointer)
+                        // If referenced structure has a specialized marshalling, then use the structure's built-in marshalling 
+                        marshalType = publicType;
 
-                break;
-            }
+                    break;
+                }
 
             case CsEnum:
                 // enums don't need a marshal type. They can always marshal as their underlying type.
@@ -143,7 +143,7 @@ public sealed class MarshalledElementFactory
 
         MakeGeneralPointersBeIntPtr(retVal);
 
-        if (retVal.PublicType is CsInterface {IsCallback: true} iface)
+        if (retVal.PublicType is CsInterface { IsCallback: true } iface)
         {
             retVal.PublicType = iface.GetNativeImplementationOrThis();
         }
@@ -171,7 +171,7 @@ public sealed class MarshalledElementFactory
         if (!csMarshallable.HasPointer)
             return;
 
-        if (csMarshallable is CsReturnValue {PublicType: CsStruct} && !csMarshallable.IsArray)
+        if (csMarshallable is CsReturnValue { PublicType: CsStruct } && !csMarshallable.IsArray)
             return;
 
         csMarshallable.MarshalType = TypeRegistry.IntPtr;
@@ -206,7 +206,10 @@ public sealed class MarshalledElementFactory
 
                 // Force Interface** to be ParamAttribute.Out
                 if (param.PublicType is CsInterface && cppAttribute == ParamAttribute.In && numIndirections == 2)
+                {
+                    cppParameter.Attribute = ParamAttribute.Out;
                     cppAttribute = ParamAttribute.Out;
+                }
 
                 isBuffer = HasFlag(cppAttribute, ParamAttribute.Buffer);
                 isIn = HasFlag(cppAttribute, ParamAttribute.In);
@@ -232,7 +235,7 @@ public sealed class MarshalledElementFactory
             {
                 var publicType = param.PublicType;
 
-                param.Attribute = publicType is CsFundamentalType {IsPointerSize: true}
+                param.Attribute = publicType is CsFundamentalType { IsPointerSize: true }
                                || publicType.IsWellKnownType(GlobalNamespace, WellKnownName.FunctionCallback)
                                       ? CsParameterAttribute.In
                                       : CsParameterAttribute.RefIn;
@@ -257,12 +260,12 @@ public sealed class MarshalledElementFactory
             switch (param.PublicType)
             {
                 // Handle void* with Buffer attribute
-                case CsFundamentalType {IsUntypedPointer: true} when isBuffer:
+                case CsFundamentalType { IsUntypedPointer: true } when isBuffer:
                     param.Attribute = CsParameterAttribute.In;
                     param.IsArray = false;
                     break;
                 // Handle strings with Out attribute
-                case CsFundamentalType {IsString: true} when isOut:
+                case CsFundamentalType { IsString: true } when isOut:
                     param.Attribute = CsParameterAttribute.In;
                     param.IsArray = false;
                     param.SetPublicResetMarshalType(TypeRegistry.IntPtr);
@@ -270,7 +273,7 @@ public sealed class MarshalledElementFactory
                 // There's no way to know how to deallocate native-allocated memory correctly
                 // since we don't know what allocator the native memory uses,
                 // so we treat any extra pointer indirections as IntPtr
-                case not CsFundamentalType {IsUntypedPointer: true} when numIndirections > 1:
+                case not CsFundamentalType { IsUntypedPointer: true } when numIndirections > 1:
                     param.IsArray = false;
                     param.SetPublicResetMarshalType(TypeRegistry.IntPtr);
                     break;
