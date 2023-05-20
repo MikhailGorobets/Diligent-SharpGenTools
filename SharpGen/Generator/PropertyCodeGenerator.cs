@@ -152,9 +152,13 @@ internal sealed class PropertyCodeGenerator : MemberMultiCodeGeneratorBase<CsPro
                          .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }
 
+        var propertyModifiers = csElement.VisibilityTokenList;
+        if (csElement.IsOverride)
+            propertyModifiers = propertyModifiers.Add(Token(SyntaxKind.NewKeyword));
+
         yield return AddDocumentationTrivia(
             PropertyDeclaration(elementType, Identifier(csElement.Name))
-               .WithModifiers(csElement.VisibilityTokenList)
+               .WithModifiers(propertyModifiers)
                .WithAccessorList(AccessorList(List(accessors))),
             csElement
         );
