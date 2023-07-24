@@ -226,9 +226,9 @@ public class MarshalledStructTests
     {
         var obj = new PointerSizeMember
         {
-            PointerSize = new PointerSize(25)
+            PointerSize = 25
         };
 
-        Assert.Equal(new PointerSize(25), Functions.PassThrough(obj).PointerSize);
+        Assert.Equal((nuint)25, Functions.PassThrough(obj).PointerSize);
     }
 }

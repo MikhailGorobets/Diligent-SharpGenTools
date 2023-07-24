@@ -300,6 +300,14 @@ struct PointerSizeMember
 	size_t pointerSize;
 };
 
+struct PointerSizeMemberExtended
+{
+	const void* byteCode = nullptr;
+
+	size_t byteCodeSize = 0;
+};
+
+
 struct StructSizeRelation
 {
 	int cbSize;
