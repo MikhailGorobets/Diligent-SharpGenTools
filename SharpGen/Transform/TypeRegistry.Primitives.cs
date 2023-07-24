@@ -78,6 +78,14 @@ public partial class TypeRegistry
         typeof(UIntPtr), new PrimitiveTypeIdentity(PrimitiveTypeCode.UIntPtr), "System.UIntPtr"
     );
 
+    public static readonly CsFundamentalType NInt = new(
+        typeof(nint), new PrimitiveTypeIdentity(PrimitiveTypeCode.NInt), "nint"
+    );
+
+    public static readonly CsFundamentalType NUInt = new(
+        typeof(nuint), new PrimitiveTypeIdentity(PrimitiveTypeCode.NUint), "nuint"
+    );
+
     private static readonly Dictionary<PrimitiveTypeIdentity, CsFundamentalType> PrimitiveTypeEntriesByIdentity =
         new()
         {
@@ -100,6 +108,8 @@ public partial class TypeRegistry
             [String.PrimitiveTypeIdentity.Value] = String,
             [IntPtr.PrimitiveTypeIdentity.Value] = IntPtr,
             [UIntPtr.PrimitiveTypeIdentity.Value] = UIntPtr,
+            [NInt.PrimitiveTypeIdentity.Value] = NInt,
+            [NUInt.PrimitiveTypeIdentity.Value] = NUInt,
             // ReSharper restore PossibleInvalidOperationException
         };
 
@@ -125,8 +135,8 @@ public partial class TypeRegistry
         ["UIntPtr"] = UIntPtr,
         ["System.IntPtr"] = IntPtr,
         ["System.UIntPtr"] = UIntPtr,
-        ["nint"] = IntPtr,
-        ["nuint"] = UIntPtr,
+        ["nint"] = NInt,
+        ["nuint"] = NUInt,
     };
 
     private static readonly Dictionary<PrimitiveTypeCode, Type> PrimitiveRuntimeTypesByCode = new()
@@ -148,5 +158,7 @@ public partial class TypeRegistry
         [PrimitiveTypeCode.String] = typeof(string),
         [PrimitiveTypeCode.IntPtr] = typeof(IntPtr),
         [PrimitiveTypeCode.UIntPtr] = typeof(UIntPtr),
+        [PrimitiveTypeCode.NInt] = typeof(nint),
+        [PrimitiveTypeCode.NUint] = typeof(nuint)
     };
 }

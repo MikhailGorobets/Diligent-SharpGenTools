@@ -11,7 +11,7 @@ public class MethodTests
     {
         using (var target = Functions.GetPassThroughMethodTest())
         {
-            Assert.Equal(new PointerSize(25), target.PassThrough(new PointerSize(25)));
+            Assert.Equal((nuint)25, target.PassThrough(25));
         }
     } 
         

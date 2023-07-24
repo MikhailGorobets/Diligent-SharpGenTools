@@ -40,6 +40,8 @@
 		<map field="StructWithPointerPrimitiveStruct::pElement" diligent-optional="true" />
 		<map field="StructWithPointerMarshaledStruct::pElement" diligent-optional="true" />
 		<map field="StructWithCallback::ModifyCallback" diligent-callback="type(ModifyDelegate); pfn(pUserData)"/>
+		<map field="PointerSizeMemberExtended::byteCode" type="unsigned char" override-native-type="true" />
+		<map field="PointerSizeMemberExtended::byteCodeSize" relation="length(byteCode)" />
 	</mapping>
 	
 	<depends>SharpGen.Runtime</depends>
